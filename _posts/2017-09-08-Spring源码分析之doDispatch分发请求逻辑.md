@@ -14,6 +14,7 @@ tags:
     - 开源框架
 ---
 
+
 首先，我的另外一篇博客已经讲述了DispatcherServlet的整个初始化过程，地址如下：
 http://blog.csdn.net/u011734144/article/details/74136168
 下面说说DispatcherServlet是如何分发请求的
