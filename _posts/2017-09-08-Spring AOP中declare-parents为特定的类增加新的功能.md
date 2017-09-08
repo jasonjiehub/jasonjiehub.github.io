@@ -49,6 +49,7 @@ public class DoSomething implements Add{
 ```
 通过配置AOP，实现两种功能的耦合
 ```
+<beans>
     <bean id="lilei" class="com.spring.test.declareparents.LiLei"/>
     <bean id="doSomething" class="com.spring.test.declareparents.DoSomething"/>
     
@@ -62,9 +63,9 @@ public class DoSomething implements Add{
     </aop:config>
 </beans>
 ```
-　　其中types-mathcing是之前原始的类，implement-interface是想要添加的功能的接口，default-impl是新功能的默认的实现。
+其中types-mathcing是之前原始的类，implement-interface是想要添加的功能的接口，default-impl是新功能的默认的实现。
 
-　　在使用时，直接通过getBean获得bean转换成相应的接口就可以使用了。
+在使用时，直接通过getBean获得bean转换成相应的接口就可以使用了。
 ```
     Chinese lilei = (Chinese)ctx.getBean("lilei");
     lilei.Say();
