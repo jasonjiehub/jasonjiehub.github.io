@@ -4,7 +4,7 @@ title:      Spring AOP中declare-parents为特定的类增加新的功能
 subtitle:   Spring AOP中declare-parents为特定的类增加新的功能
 date:       2017-09-08
 author:     Jason
-header-img: img/post-bg-re-vs-ng2.jpg
+header-img: 
 catalog: true
 tags:
     - SPring
@@ -20,19 +20,22 @@ tags:
 如果是可以改写的类，直接实现自定义的接口就行了，下面看看AOP是如何做的！
 
 最开始使用的类和接口：
-
+```
 package com.spring.test.declareparents;
 
 public interface Chinese {
     public void Say();
 }
+```
+```
 public class LiLei implements Chinese{
     public void Say() {
         System.out.println("我是中国人！");
     }
 }
-　　想要添加的新功能和接口
-
+```
+想要添加的新功能和接口
+```
 package com.spring.test.declareparents;
 
 public interface Add {
@@ -43,9 +46,9 @@ public class DoSomething implements Add{
         System.out.println("我爱中国！");
     }
 }
-　　通过配置AOP，实现两种功能的耦合
-
-复制代码
+```
+通过配置AOP，实现两种功能的耦合
+```
     <bean id="lilei" class="com.spring.test.declareparents.LiLei"/>
     <bean id="doSomething" class="com.spring.test.declareparents.DoSomething"/>
     
@@ -58,16 +61,17 @@ public class DoSomething implements Add{
         </aop:aspect>
     </aop:config>
 </beans>
-复制代码
+```
 　　其中types-mathcing是之前原始的类，implement-interface是想要添加的功能的接口，default-impl是新功能的默认的实现。
 
 　　在使用时，直接通过getBean获得bean转换成相应的接口就可以使用了。
+```
+    Chinese lilei = (Chinese)ctx.getBean("lilei");
+    lilei.Say();
 
-        Chinese lilei = (Chinese)ctx.getBean("lilei");
-        lilei.Say();
-        
-        Add lilei2 = (Add)ctx.getBean("lilei");
-        lilei2.Todo();
+    Add lilei2 = (Add)ctx.getBean("lilei");
+    lilei2.Todo();
+```
  
 
 
