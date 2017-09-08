@@ -9,7 +9,6 @@ catalog: true
 tags:
     - Spring
     - Java
-    - Linux
 ---
 
 
