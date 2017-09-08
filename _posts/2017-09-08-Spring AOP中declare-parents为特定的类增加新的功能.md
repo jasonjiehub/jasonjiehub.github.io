@@ -7,14 +7,8 @@ author:     Jason
 header-img: img/post-bg-re-vs-ng2.jpg
 catalog: true
 tags:
-    - Blog
+    - SPring
 ---
-
-> 正所谓前人栽树，后人乘凉。
-> 
-> 感谢[Huxpro](https://github.com/huxpro)提供的博客模板
-> 
-> [我的的博客](http://qiubaiying.top)
 
 
 如果有这样一个需求，为一个已知的API添加一个新的功能。
