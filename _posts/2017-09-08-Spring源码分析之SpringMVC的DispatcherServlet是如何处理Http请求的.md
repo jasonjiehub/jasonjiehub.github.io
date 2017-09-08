@@ -9,9 +9,7 @@ catalog: true
 tags:
     - Spring
     - Java
-    - Git
-    - 源码分析
-    - 开源框架
+    - Linux
 ---
 
 一般我们会在web.xml文件中配置DispatcherServlet，比如如下配置方式：
