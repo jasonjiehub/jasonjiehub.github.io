@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      Spring AOP中declare-parents为特定的类增加新的功能
-subtitle:   Spring AOP中declare-parents为特定的类增加新的功能
+subtitle:   
 date:       2017-09-08
 author:     Jason
 header-img: 
