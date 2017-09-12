@@ -3,7 +3,7 @@ layout:     post
 title:      我是如何解决jobtracker.info could only be replicated to 0 nodes, instead of 1这个问题的
 subtitle:   
 date:       2017-09-08
-author: ? ? Jason
+author:  Jason
 header-img: 
 catalog: true
 tags:
