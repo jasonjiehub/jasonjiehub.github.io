@@ -96,5 +96,8 @@ friends: [
     {
         title: "CSDN",
         href: "http://blog.csdn.net/u011734144"
+    },{
+        title: "码云",
+        href: "https://git.oschina.net/hustjasonjie"
     }
 ]
