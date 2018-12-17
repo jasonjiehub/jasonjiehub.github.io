@@ -6,7 +6,7 @@ email: hustjasonjie@163.com
 description: "Try my best to do everything."
 keyword: "Jason, 博客, Web开发, Java, Python"
 #url: "https://jasonjiehub.github.io"          # your host, for absolute URL
-url: "http://denglinjie.com"
+url: "http://www.denglinjie.com"
 baseurl: ""      # for example, '/blog' if your blog hosted on 'host/blog'
 github_repo: "https://github.com/jasonjiehub/jasonjiehub.github.io.git" # you code repository
 
