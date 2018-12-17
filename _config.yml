@@ -74,7 +74,7 @@ ba_track_id: c84217e516a55708f08b6b904e682183
 
 # Google Analytics
 #ga_track_id: 'UA-90855596-1'            # Format: UA-xxxxxx-xx
-ga_domain: www.denglinjie.com
+#ga_domain: auto
 
 
 
