@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>Spring源码分析之Aop中拦截器,适配器,通知之间的关系 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="首先举一个例子：123456789101112131415161718192021222324public class MethodBeforeAdviceInterceptor implements MethodInterceptor, Serializable &amp;#123;        private MethodBeforeAdvice advice;          /**">
+<meta name="keywords" content="Spring,Java,Linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring源码分析之Aop中拦截器,适配器,通知之间的关系">
+<meta property="og:url" content="http://yoursite.com/2017/09/08/2017-09-08-Spring源码分析之Aop中拦截器,适配器,通知之间的关系/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="首先举一个例子：123456789101112131415161718192021222324public class MethodBeforeAdviceInterceptor implements MethodInterceptor, Serializable &amp;#123;        private MethodBeforeAdvice advice;          /**">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-18T02:52:45.199Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring源码分析之Aop中拦截器,适配器,通知之间的关系">
+<meta name="twitter:description" content="首先举一个例子：123456789101112131415161718192021222324public class MethodBeforeAdviceInterceptor implements MethodInterceptor, Serializable &amp;#123;        private MethodBeforeAdvice advice;          /**">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2017-09-08-Spring源码分析之Aop中拦截器,适配器,通知之间的关系" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/09/08/2017-09-08-Spring源码分析之Aop中拦截器,适配器,通知之间的关系/" class="article-date">
+  <time datetime="2017-09-07T16:00:00.000Z" itemprop="datePublished">2017-09-08</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Spring源码分析之Aop中拦截器,适配器,通知之间的关系
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>首先举一个例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">public class MethodBeforeAdviceInterceptor implements MethodInterceptor, Serializable &#123;  </span><br><span class="line">  </span><br><span class="line">    private MethodBeforeAdvice advice;  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">    /**  </span><br><span class="line">     * Create a new MethodBeforeAdviceInterceptor for the given advice.  </span><br><span class="line">     * @param advice the MethodBeforeAdvice to wrap  </span><br><span class="line">     */  </span><br><span class="line">    public MethodBeforeAdviceInterceptor(MethodBeforeAdvice advice) &#123;  </span><br><span class="line">        Assert.notNull(advice, &quot;Advice must not be null&quot;);  </span><br><span class="line">        this.advice = advice;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    //这个invoke方法是拦截器的回调方法,会在代理对象的方法被调用时触发回调  </span><br><span class="line">    @Override  </span><br><span class="line">    public Object invoke(MethodInvocation mi) throws Throwable &#123;  </span><br><span class="line">        //首先触发advise的before回调  </span><br><span class="line">        this.advice.before(mi.getMethod(), mi.getArguments(), mi.getThis() );  </span><br><span class="line">        //然后才是MethodInvocation的proceed方法调用  </span><br><span class="line">        return mi.proceed();  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面是MethodBeforeAdviceInterceptor拦截器的源码，MethodBeforeAdvice是对应的通知，另外还有一个角色类是MethodBeforeAdviceAdapter适配器类，这个适配器的源码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">class MethodBeforeAdviceAdapter implements AdvisorAdapter, Serializable &#123;  </span><br><span class="line">  </span><br><span class="line">    @Override  </span><br><span class="line">    public boolean supportsAdvice(Advice advice) &#123;  </span><br><span class="line">        return (advice instanceof MethodBeforeAdvice);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    @Override  </span><br><span class="line">    public MethodInterceptor getInterceptor(Advisor advisor) &#123;  </span><br><span class="line">        MethodBeforeAdvice advice = (MethodBeforeAdvice) advisor.getAdvice();  </span><br><span class="line">        return new MethodBeforeAdviceInterceptor(advice);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到，它的主要作用是，将通知advisor.getAdvice()转换或者说适配成对应的拦截器，有如下三种适配：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. MethodBeforeAdviceAdapter将MethodBeforeAdvice适配成MethodBeforeAdviceInterceptor  </span><br><span class="line">2. AfterReturningAdviceAdapter将AfterReturningAdvice适配成AfterReturningAdviceInterceptor  </span><br><span class="line">3.ThrowsAdviceAdapter将ThrowsAdvice适配成ThrowsAdviceInterceptor</span><br></pre></td></tr></table></figure></p>
+<p>这样适配的目的是什么呢？<br>还得回到我们最初的MethodBeforeAdviceInterceptor的源码中去看<br>首先我们得知道通知是什么，通知就是在调用目标方法之前或者之后等要被调用的增强的方法，比如这里的MethodBeforeAdvice的before方法需要在调用目标方法之前被调用，AfterReturningAdvice的afterReturning方法需要在目标方法被调用之后调用，这个调用逻辑（调用顺序）就是由通知对应的拦截器来完成的，可以看到MethodBeforeAdviceInterceptor由于是前置通知的适配器，所以它的invoke方法在执行下一个拦截器的时候先调用了通知的before方法，然后进入到了下一个拦截器。<br>也就是说，通知只是定义了增强时将要被调用的方法，而方法具体何时调用需要由通知对应的拦截器来进行管理，而适配器的作用就是根据通知得到其对应的拦截器<br>再可以看看AfterReturningAdviceInterceptor拦截器<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">public class AfterReturningAdviceInterceptor implements MethodInterceptor, AfterAdvice, Serializable &#123;  </span><br><span class="line">  </span><br><span class="line">    private final AfterReturningAdvice advice;  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">    /**  </span><br><span class="line">     * Create a new AfterReturningAdviceInterceptor for the given advice.  </span><br><span class="line">     * @param advice the AfterReturningAdvice to wrap  </span><br><span class="line">     */  </span><br><span class="line">    public AfterReturningAdviceInterceptor(AfterReturningAdvice advice) &#123;  </span><br><span class="line">        Assert.notNull(advice, &quot;Advice must not be null&quot;);  </span><br><span class="line">        this.advice = advice;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    @Override  </span><br><span class="line">    public Object invoke(MethodInvocation mi) throws Throwable &#123;  </span><br><span class="line">        Object retVal = mi.proceed();  </span><br><span class="line">        this.advice.afterReturning(retVal, mi.getMethod(), mi.getArguments(), mi.getThis());  </span><br><span class="line">        return retVal;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这个后置通知拦截器就是在先进入到下一个拦截器后，然后再调用的对应通知AfterReturningAdvice的afterReturning方法<br>所以我们可以看到，这几个拦截器实现的功能其实非常类似于动态代理设计模式里面实现了InvocationHandler接口的那个类，比如如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public class ProxyHandler implements InvocationHandler &#123;  </span><br><span class="line">  </span><br><span class="line">    private Object target;  </span><br><span class="line">  </span><br><span class="line">    public ProxyHandler(Object target) &#123;  </span><br><span class="line">        this.target = target;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable &#123;  </span><br><span class="line">  </span><br><span class="line">        System.out.println(&quot;call before target&quot;);  </span><br><span class="line">  </span><br><span class="line">        Object proxyObject = method.invoke(target, args);   //这里是要调用目标对象target的目标方法method  </span><br><span class="line">  </span><br><span class="line">        System.out.println(&quot;call after target&quot;);  </span><br><span class="line">  </span><br><span class="line">        return proxyObject;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里目标target的方法被调用前，会被这个类的invoke方法拦截，method.invoke(target, args) 是调用目标方法，这里可以在其前后做一些增强方法</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/09/08/2017-09-08-Spring源码分析之Aop中拦截器,适配器,通知之间的关系/" data-id="cjpt5le2o000729mz3phd8riv" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/09/08/2017-09-08-Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/09/08/2017-09-08-Spring源码分析之lazy-init属性的配置/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Spring源码分析之lazy-init属性的配置</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/12/18/��һƪ���/">��һƪ���</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/18/my-site/">my_site</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/18/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2017/09/08/2017-09-08-Spring IOC学习心得之注册bean的依赖关系/">Spring IOC学习心得之注册bean的依赖关系</a>
+          </li>
+        
+          <li>
+            <a href="/2017/09/08/2017-09-08-Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)/">Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

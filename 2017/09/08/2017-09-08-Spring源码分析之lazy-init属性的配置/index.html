@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>Spring源码分析之lazy-init属性的配置 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="AbstractApplicationContext类默认在容器初始化的过程中就会执行依赖注入，即等价于配置lazy-init属性为false，bean的配置如下：123456789&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;&amp;lt;beans xmlns=&amp;quot;http://www.springframew">
+<meta name="keywords" content="Spring,Java,Linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring源码分析之lazy-init属性的配置">
+<meta property="og:url" content="http://yoursite.com/2017/09/08/2017-09-08-Spring源码分析之lazy-init属性的配置/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="AbstractApplicationContext类默认在容器初始化的过程中就会执行依赖注入，即等价于配置lazy-init属性为false，bean的配置如下：123456789&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;&amp;lt;beans xmlns=&amp;quot;http://www.springframew">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-18T02:52:45.199Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring源码分析之lazy-init属性的配置">
+<meta name="twitter:description" content="AbstractApplicationContext类默认在容器初始化的过程中就会执行依赖注入，即等价于配置lazy-init属性为false，bean的配置如下：123456789&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;&amp;lt;beans xmlns=&amp;quot;http://www.springframew">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2017-09-08-Spring源码分析之lazy-init属性的配置" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/09/08/2017-09-08-Spring源码分析之lazy-init属性的配置/" class="article-date">
+  <time datetime="2017-09-07T16:00:00.000Z" itemprop="datePublished">2017-09-08</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Spring源码分析之lazy-init属性的配置
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>AbstractApplicationContext类默认在容器初始化的过程中就会执行依赖注入，即等价于配置lazy-init属性为false，bean的配置如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;</span><br><span class="line">       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">       xmlns:context=&quot;http://www.springframework.org/schema/context&quot;</span><br><span class="line">       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans</span><br><span class="line">        http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;bean id=&quot;studentService&quot; class=&quot;com.verify.constant.StudentService&quot; init-method=&quot;initMethod&quot; lazy-init=&quot;false&quot;/&gt;</span><br><span class="line">&lt;/beans&gt;</span><br></pre></td></tr></table></figure></p>
+<p>容器的初始化是在AbstractApplicationContext的refresh()方法中执行的，如下代码对lazy-init进行了处理：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">finishBeanFactoryInitialization(beanFactory);</span><br></pre></td></tr></table></figure></p>
+<p>跟踪下去可以找到真正的读取lazy-init属性进行懒加载相关处理的地方<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">	public void preInstantiateSingletons() throws BeansException &#123;</span><br><span class="line">		if (this.logger.isDebugEnabled()) &#123;</span><br><span class="line">			this.logger.debug(&quot;Pre-instantiating singletons in &quot; + this);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		// Iterate over a copy to allow for init methods which in turn register new bean definitions.</span><br><span class="line">		// While this may not be part of the regular factory bootstrap, it does otherwise work fine.</span><br><span class="line">		List&lt;String&gt; beanNames = new ArrayList&lt;String&gt;(this.beanDefinitionNames);</span><br><span class="line"></span><br><span class="line">		// Trigger initialization of all non-lazy singleton beans...</span><br><span class="line">		for (String beanName : beanNames) &#123;</span><br><span class="line">			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);</span><br><span class="line">			if (!bd.isAbstract() &amp;&amp; bd.isSingleton() &amp;&amp; !bd.isLazyInit()) &#123;</span><br><span class="line">				if (isFactoryBean(beanName)) &#123;</span><br><span class="line">					final FactoryBean&lt;?&gt; factory = (FactoryBean&lt;?&gt;) getBean(FACTORY_BEAN_PREFIX + beanName);</span><br><span class="line">					boolean isEagerInit;</span><br><span class="line">					if (System.getSecurityManager() != null &amp;&amp; factory instanceof SmartFactoryBean) &#123;</span><br><span class="line">						isEagerInit = AccessController.doPrivileged(new PrivilegedAction&lt;Boolean&gt;() &#123;</span><br><span class="line">							@Override</span><br><span class="line">							public Boolean run() &#123;</span><br><span class="line">								return ((SmartFactoryBean&lt;?&gt;) factory).isEagerInit();</span><br><span class="line">							&#125;</span><br><span class="line">						&#125;, getAccessControlContext());</span><br><span class="line">					&#125;</span><br><span class="line">					else &#123;</span><br><span class="line">						isEagerInit = (factory instanceof SmartFactoryBean &amp;&amp;</span><br><span class="line">								((SmartFactoryBean&lt;?&gt;) factory).isEagerInit());</span><br><span class="line">					&#125;</span><br><span class="line">					if (isEagerInit) &#123;</span><br><span class="line">						getBean(beanName);</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">				else &#123;</span><br><span class="line">					getBean(beanName);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		// Trigger post-initialization callback for all applicable beans...</span><br><span class="line">		for (String beanName : beanNames) &#123;</span><br><span class="line">			Object singletonInstance = getSingleton(beanName);</span><br><span class="line">			if (singletonInstance instanceof SmartInitializingSingleton) &#123;</span><br><span class="line">				final SmartInitializingSingleton smartSingleton = (SmartInitializingSingleton) singletonInstance;</span><br><span class="line">				if (System.getSecurityManager() != null) &#123;</span><br><span class="line">					AccessController.doPrivileged(new PrivilegedAction&lt;Object&gt;() &#123;</span><br><span class="line">						@Override</span><br><span class="line">						public Object run() &#123;</span><br><span class="line">							smartSingleton.afterSingletonsInstantiated();</span><br><span class="line">							return null;</span><br><span class="line">						&#125;</span><br><span class="line">					&#125;, getAccessControlContext());</span><br><span class="line">				&#125;</span><br><span class="line">				else &#123;</span><br><span class="line">					smartSingleton.afterSingletonsInstantiated();</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到代码中对所有注册的bean，即this.beanDefinitionNames，对于每个bean都会做如下判断，如果成立就会执行依赖注入：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">if (!bd.isAbstract() &amp;&amp; bd.isSingleton() &amp;&amp; !bd.isLazyInit())</span><br></pre></td></tr></table></figure></p>
+<p>可以看出，只有单例的bean才有可能在容器初始化的时候就完成依赖注入，当lazy-init属性不配置(默认值)或者配置为false的时候，上述if就会成立，当然这里默认不配置abstract属性，所以它默认也是false。if成立，就会执行getBean从而进行依赖注入，这样在容器初始化的过程中就已经实例化了Bean，当真正的请求bean的时候，其实只是从缓存中读取而已。<br>而如果lazy-init属性配置为true，那么就会进行懒加载了，这样在容器初始化的过程中不会进行依赖注入，只有当第一个getBean的时候才会实例化Bean。<br>最后抛出一个我还没有搞明白的问题：<br>书上说的是容器在初始化的过程中默认情况下其实并没有发生依赖注入，而是在第一次getBean的时候才会进行依赖注入，但是这个说法与上述AbstractApplicationContext的容器初始化过程好像是不一致的？还是说AbstractApplicationContext默认是进行依赖注入，但是BeanFactory默认不进行依赖注入？</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/09/08/2017-09-08-Spring源码分析之lazy-init属性的配置/" data-id="cjpt5le2q000829mz4k6c03xk" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/09/08/2017-09-08-Spring源码分析之Aop中拦截器,适配器,通知之间的关系/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Spring源码分析之Aop中拦截器,适配器,通知之间的关系
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/09/08/2017-09-12-我是如何解决jobtracker.info could only be replicated to 0 nodes, instead of 1这个问题的/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">我是如何解决jobtracker.info could only be replicated to 0 nodes, instead of 1这个问题的</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/12/18/��һƪ���/">��һƪ���</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/18/my-site/">my_site</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/18/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2017/09/08/2017-09-08-Spring IOC学习心得之注册bean的依赖关系/">Spring IOC学习心得之注册bean的依赖关系</a>
+          </li>
+        
+          <li>
+            <a href="/2017/09/08/2017-09-08-Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)/">Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

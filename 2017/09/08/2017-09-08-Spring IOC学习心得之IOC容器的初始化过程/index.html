@@ -5,16 +5,20 @@
   
 
   
-  <title>my_site | Hexo</title>
+  <title>Spring IOC学习心得之IOC容器的初始化过程 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="article">
-<meta property="og:title" content="my_site">
-<meta property="og:url" content="http://yoursite.com/2018/12/18/my-site/index.html">
+  <meta name="description" content="注：本文大多数内容都是摘自《Spring技术内幕》这本书简单来说，Ioc容器的初始化过程是在refresh（）方法中启动的，包括BeanDefinition的Resource定位，载入和注册三个过程。第一：Resource的定位这个Resource指的是BeanDefinition的资源定位，由ResourceLoader通过统一的Resource接口来完成。文件系统中的Bean定义信息可以使用F">
+<meta name="keywords" content="Spring,Java,Linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring IOC学习心得之IOC容器的初始化过程">
+<meta property="og:url" content="http://yoursite.com/2017/09/08/2017-09-08-Spring IOC学习心得之IOC容器的初始化过程/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="注：本文大多数内容都是摘自《Spring技术内幕》这本书简单来说，Ioc容器的初始化过程是在refresh（）方法中启动的，包括BeanDefinition的Resource定位，载入和注册三个过程。第一：Resource的定位这个Resource指的是BeanDefinition的资源定位，由ResourceLoader通过统一的Resource接口来完成。文件系统中的Bean定义信息可以使用F">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-12-18T02:03:52.127Z">
+<meta property="og:updated_time" content="2018-12-18T02:52:45.199Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="my_site">
+<meta name="twitter:title" content="Spring IOC学习心得之IOC容器的初始化过程">
+<meta name="twitter:description" content="注：本文大多数内容都是摘自《Spring技术内幕》这本书简单来说，Ioc容器的初始化过程是在refresh（）方法中启动的，包括BeanDefinition的Resource定位，载入和注册三个过程。第一：Resource的定位这个Resource指的是BeanDefinition的资源定位，由ResourceLoader通过统一的Resource接口来完成。文件系统中的Bean定义信息可以使用F">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -61,10 +65,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-my-site" class="article article-type-post" itemscope="" itemprop="blogPost">
+        <section id="main"><article id="post-2017-09-08-Spring IOC学习心得之IOC容器的初始化过程" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2018/12/18/my-site/" class="article-date">
-  <time datetime="2018-12-18T02:03:52.000Z" itemprop="datePublished">2018-12-18</time>
+    <a href="/2017/09/08/2017-09-08-Spring IOC学习心得之IOC容器的初始化过程/" class="article-date">
+  <time datetime="2017-09-07T16:00:00.000Z" itemprop="datePublished">2017-09-08</time>
 </a>
     
   </div>
@@ -75,7 +79,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      my_site
+      Spring IOC学习心得之IOC容器的初始化过程
     </h1>
   
 
@@ -83,32 +87,38 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <p>注：本文大多数内容都是摘自《Spring技术内幕》这本书<br>简单来说，Ioc容器的初始化过程是在refresh（）方法中启动的，包括BeanDefinition的Resource定位，载入和注册三个过程。<br>第一：Resource的定位<br>这个Resource指的是BeanDefinition的资源定位，由ResourceLoader通过统一的Resource接口来完成。文件系统中的Bean定义信息可以使用FileSystemResource来进行抽象，类路径中的Bean定义信息可以使用ClassPathResource来抽象。</p>
+<p>第二： BeanDefinition的载入<br>上面已经定位了资源Resource的位置，接下来就是将Bean定义表示成Ioc容器内部的结果，即读取进来封装成BeanDefinition。</p>
+<p>第三：向IOc容器注册这些BeanDefinition<br>实际上就是将BeanDefinition注册到Hashmap中去，IOC就是通过这个HashMap来持有这些BeanDefinition数据的</p>
+<p>但是请注意，上面三个过程不包含Bean依赖注入的过程，依赖注入一般发生在应用第一次通过getBean向容器索取Bean的时候，但是有一个例外是，可以设置Bean的lazyinit属性，那么这个Bean的依赖注入就再IOC容器初始化时就预先完成了</p>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/18/my-site/" data-id="cjpt5le3p000d29mzkdy8i430" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/09/08/2017-09-08-Spring IOC学习心得之IOC容器的初始化过程/" data-id="cjpt5le24000329mzrn65j9tf" class="article-share-link">Share</a>
       
       
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li></ul>
+
     </footer>
   </div>
   
     
 <nav id="article-nav">
   
-    <a href="/2018/12/18/��һƪ���/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2017/09/08/2017-09-08-Spring AOP中declare-parents为特定的类增加新的功能/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
-          ��һƪ���
+          Spring AOP中declare-parents为特定的类增加新的功能
         
       </div>
     </a>
   
   
-    <a href="/2018/12/18/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2017/09/08/2017-09-08-Spring IOC学习心得之BeanPostProcessor，BeanNameAware，BeanClassLoaderAware，BeanFactoryAware接口是如何起作用的/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">Hello World</div>
+      <div class="article-nav-title">Spring IOC学习心得之BeanPostProcessor，BeanNameAware，BeanClassLoaderAware，BeanFactoryAware接口是如何起作用的</div>
     </a>
   
 </nav>

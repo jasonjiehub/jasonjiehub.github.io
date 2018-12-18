@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>Spring IOC学习心得之BeanPostProcessor，BeanNameAware，BeanClassLoaderAware，BeanFactoryAware接口是如何起作用的 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="首先说下BeanPostProcessor接口中的两个方法，如下：1234567891011121314package org.springframework.beans.factory.config;    import org.springframework.beans.BeansException;      public interface BeanPostProcessor &amp;#123">
+<meta name="keywords" content="Spring,Java,Linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring IOC学习心得之BeanPostProcessor，BeanNameAware，BeanClassLoaderAware，BeanFactoryAware接口是如何起作用的">
+<meta property="og:url" content="http://yoursite.com/2017/09/08/2017-09-08-Spring IOC学习心得之BeanPostProcessor，BeanNameAware，BeanClassLoaderAware，BeanFactoryAware接口是如何起作用的/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="首先说下BeanPostProcessor接口中的两个方法，如下：1234567891011121314package org.springframework.beans.factory.config;    import org.springframework.beans.BeansException;      public interface BeanPostProcessor &amp;#123">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-18T02:52:45.198Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring IOC学习心得之BeanPostProcessor，BeanNameAware，BeanClassLoaderAware，BeanFactoryAware接口是如何起作用的">
+<meta name="twitter:description" content="首先说下BeanPostProcessor接口中的两个方法，如下：1234567891011121314package org.springframework.beans.factory.config;    import org.springframework.beans.BeansException;      public interface BeanPostProcessor &amp;#123">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2017-09-08-Spring IOC学习心得之BeanPostProcessor，BeanNameAware，BeanClassLoaderAware，BeanFactoryAware接口是如何起作用的" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/09/08/2017-09-08-Spring IOC学习心得之BeanPostProcessor，BeanNameAware，BeanClassLoaderAware，BeanFactoryAware接口是如何起作用的/" class="article-date">
+  <time datetime="2017-09-07T16:00:00.000Z" itemprop="datePublished">2017-09-08</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Spring IOC学习心得之BeanPostProcessor，BeanNameAware，BeanClassLoaderAware，BeanFactoryAware接口是如何起作用的
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <ol>
+<li>首先说下BeanPostProcessor接口中的两个方法，如下：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">package org.springframework.beans.factory.config;  </span><br><span class="line">  </span><br><span class="line">import org.springframework.beans.BeansException;  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">public interface BeanPostProcessor &#123;  </span><br><span class="line">  </span><br><span class="line">        //Bean初始化的前置处理器  </span><br><span class="line">    Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException;  </span><br><span class="line">  </span><br><span class="line">    //Bean初始化的后置处理器  </span><br><span class="line">    Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException;  </span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>应用中自定义的Bean，可以实现这个接口，并覆盖这两个方法来控制Bean的初始化过程，即在Bean的初始化之前做一件事，即调用postProcessBeforeInitialization方法，也可以在Bean的初始化之后做一件事，即调用postProcessAfterInitialization方法。那么这两个方法究竟是如何被Spring调用的呢？</p>
+<ol start="2">
+<li><p>在Bean的初始化过程中，会调用initializeBean方法，该方法的源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">protected Object initializeBean(final String beanName, final Object bean, RootBeanDefinition mbd) &#123;  </span><br><span class="line">        if (System.getSecurityManager() != null) &#123;  </span><br><span class="line">            AccessController.doPrivileged(new PrivilegedAction&lt;Object&gt;() &#123;  </span><br><span class="line">                @Override  </span><br><span class="line">                public Object run() &#123;  </span><br><span class="line">                    invokeAwareMethods(beanName, bean);  </span><br><span class="line">                    return null;  </span><br><span class="line">                &#125;  </span><br><span class="line">            &#125;, getAccessControlContext());  </span><br><span class="line">        &#125;  </span><br><span class="line">        else &#123;  </span><br><span class="line">            invokeAwareMethods(beanName, bean);  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        Object wrappedBean = bean;  </span><br><span class="line">        if (mbd == null || !mbd.isSynthetic()) &#123;  </span><br><span class="line">            //执行BeanPostProcessor扩展点的PostProcessBeforeInitialization进行修改实例化Bean  </span><br><span class="line">            wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        try &#123;  </span><br><span class="line">            //调用Bean的初始化方法,这个初始化方法是在BeanDefinition中通过定义init-method属性指定的  </span><br><span class="line">            //同时,如果Bean实现了InitializingBean接口,那么这个Bean的afterPropertiesSet实现也不会被调用  </span><br><span class="line">            invokeInitMethods(beanName, wrappedBean, mbd);  </span><br><span class="line">        &#125;  </span><br><span class="line">        catch (Throwable ex) &#123;  </span><br><span class="line">            throw new BeanCreationException(  </span><br><span class="line">                    (mbd != null ? mbd.getResourceDescription() : null),  </span><br><span class="line">                    beanName, &quot;Invocation of init method failed&quot;, ex);  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        if (mbd == null || !mbd.isSynthetic()) &#123;  </span><br><span class="line">            //执行BeanPostProcessor扩展点的PostProcessAfterInitialization进行修改实例化Bean  </span><br><span class="line">            wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);  </span><br><span class="line">        &#125;  </span><br><span class="line">        return wrappedBean;  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>BeanPostProcessor起作用的方式<br>先说下invokeInitMethods方法，这个是真正的Bean的初始化方法，我们可以看到在该方法之前有一个方法applyBeanPostProcessorsBeforeInitialization，该方法实现Bean初始化的前置处理，可以看下该方法的源码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">@Override  </span><br><span class="line">    public Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName)  </span><br><span class="line">            throws BeansException &#123;  </span><br><span class="line">  </span><br><span class="line">        Object result = existingBean;  </span><br><span class="line">        for (BeanPostProcessor beanProcessor : getBeanPostProcessors()) &#123;  </span><br><span class="line">            result = beanProcessor.postProcessBeforeInitialization(result, beanName);  </span><br><span class="line">            if (result == null) &#123;  </span><br><span class="line">                return result;  </span><br><span class="line">            &#125;  </span><br><span class="line">        &#125;  </span><br><span class="line">        return result;  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>这个方法中会通过getBeanPostProcessors方法去获取Bean所实现的所有的BeanPostProcessor接口，并调用其postProcessBeforeInitialization方法来实现在Bean的初始化之前做一些预处理<br>在invokeInitMethods方法之后，有一个applyBeanPostProcessorsAfterInitialization方法，该方法实现Bean的初始化的后置处理，可以看下该方法的源码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">@Override  </span><br><span class="line">    public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName)  </span><br><span class="line">            throws BeansException &#123;  </span><br><span class="line">  </span><br><span class="line">        Object result = existingBean;  </span><br><span class="line">        for (BeanPostProcessor beanProcessor : getBeanPostProcessors()) &#123;  </span><br><span class="line">            result = beanProcessor.postProcessAfterInitialization(result, beanName);  </span><br><span class="line">            if (result == null) &#123;  </span><br><span class="line">                return result;  </span><br><span class="line">            &#125;  </span><br><span class="line">        &#125;  </span><br><span class="line">        return result;  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>与前置处理类似，也是获取Bean实现的所有BeanPostProcessor接口，然后调用所有接口的postProcessAfterInitialization后置处理方法</p>
+<ol start="4">
+<li>BeanNameAware，BeanClassLoaderAware，BeanFactoryAware接口起作用的方式<br>大家注意到initializebean方法中有一个invokeAwareMethods方法，先看下这个方法的源码：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">private void invokeAwareMethods(final String beanName, final Object bean) &#123;  </span><br><span class="line">        if (bean instanceof Aware) &#123;  </span><br><span class="line">            if (bean instanceof BeanNameAware) &#123;  </span><br><span class="line">                ((BeanNameAware) bean).setBeanName(beanName);  </span><br><span class="line">            &#125;  </span><br><span class="line">            if (bean instanceof BeanClassLoaderAware) &#123;  </span><br><span class="line">                ((BeanClassLoaderAware) bean).setBeanClassLoader(getBeanClassLoader());  </span><br><span class="line">            &#125;  </span><br><span class="line">            if (bean instanceof BeanFactoryAware) &#123;  </span><br><span class="line">                ((BeanFactoryAware) bean).setBeanFactory(AbstractAutowireCapableBeanFactory.this);  </span><br><span class="line">            &#125;  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>举例来说，当应用自定义的Bean实现了BeanNameAware接口，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public class MyBean implements BeanNameAware &#123;  </span><br><span class="line">    private String beanName;  </span><br><span class="line">  </span><br><span class="line">    void setBeanName(String name) &#123;  </span><br><span class="line">        this.beanName = name;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这样就可以获取到该Bean在Spring容器中的名字，原理就是上述invokeAwareMethods方法中，判断了如果bean实现了BeanNameAware接口，就会调用该Bean覆盖的BeanNameAware接口的setBeanName方法，这样MyBean中就获取到了该Bean在Spring容器中的名字。<br>BeanClassLoaderAware接口和BeanFactoryAware接口同理，可以分别获取Bean的类装载器和bean工厂</p>
+<ol start="5">
+<li>InitializeBean接口起作用的方式<br>最后来说下真正的初始化方法invokeInitMethods，该方法的源码如下：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">protected void invokeInitMethods(String beanName, final Object bean, RootBeanDefinition mbd)  </span><br><span class="line">            throws Throwable &#123;  </span><br><span class="line">  </span><br><span class="line">        boolean isInitializingBean = (bean instanceof InitializingBean);  </span><br><span class="line">        if (isInitializingBean &amp;&amp; (mbd == null || !mbd.isExternallyManagedInitMethod(&quot;afterPropertiesSet&quot;))) &#123;  </span><br><span class="line">            if (logger.isDebugEnabled()) &#123;  </span><br><span class="line">                logger.debug(&quot;Invoking afterPropertiesSet() on bean with name &apos;&quot; + beanName + &quot;&apos;&quot;);  </span><br><span class="line">            &#125;  </span><br><span class="line">            if (System.getSecurityManager() != null) &#123;  </span><br><span class="line">                try &#123;  </span><br><span class="line">                    AccessController.doPrivileged(new PrivilegedExceptionAction&lt;Object&gt;() &#123;  </span><br><span class="line">                        @Override  </span><br><span class="line">                        public Object run() throws Exception &#123;  </span><br><span class="line">                            ((InitializingBean) bean).afterPropertiesSet();  </span><br><span class="line">                            return null;  </span><br><span class="line">                        &#125;  </span><br><span class="line">                    &#125;, getAccessControlContext());  </span><br><span class="line">                &#125;  </span><br><span class="line">                catch (PrivilegedActionException pae) &#123;  </span><br><span class="line">                    throw pae.getException();  </span><br><span class="line">                &#125;  </span><br><span class="line">            &#125;  </span><br><span class="line">            else &#123;  </span><br><span class="line">                ((InitializingBean) bean).afterPropertiesSet(); //启动afterPropertiesSet,afterPropertiesSet是InitializingBean接口的方法  </span><br><span class="line">            &#125;  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        if (mbd != null) &#123;  </span><br><span class="line">            String initMethodName = mbd.getInitMethodName();    //获取用户自定义的初始化方法  </span><br><span class="line">            if (initMethodName != null &amp;&amp; !(isInitializingBean &amp;&amp; &quot;afterPropertiesSet&quot;.equals(initMethodName)) &amp;&amp;  </span><br><span class="line">                    !mbd.isExternallyManagedInitMethod(initMethodName)) &#123;  </span><br><span class="line">                invokeCustomInitMethod(beanName, bean, mbd);    //调用自定义的初始化方法  </span><br><span class="line">            &#125;  </span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>可以看到方法中判断了如果该Bean实现了InitializeBean接口，即bean instanceof InitializingBean == true，就会调用该Bean实现的Initializebean接口的afterPropertiesSet方法</p>
+<ol start="6">
+<li>自定义的初始化方法起作用的方式<br>上述代码中有一个方法getInitMethodName，可以获取用户自定义的初始化方法，然后通过调用invokeCustomInitMethod方法来执行用户自定义的初始化方法</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/09/08/2017-09-08-Spring IOC学习心得之BeanPostProcessor，BeanNameAware，BeanClassLoaderAware，BeanFactoryAware接口是如何起作用的/" data-id="cjpt5le6g001d29mzh5y3ur0d" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/09/08/2017-09-08-Spring IOC学习心得之IOC容器的初始化过程/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Spring IOC学习心得之IOC容器的初始化过程
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/09/08/2017-09-08-Spring源码分析之SpringMVC的DispatcherServlet是如何处理Http请求的/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Spring源码分析之SpringMVC的DispatcherServlet是如何处理Http请求的</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/12/18/��һƪ���/">��һƪ���</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/18/my-site/">my_site</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/18/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2017/09/08/2017-09-08-Spring IOC学习心得之注册bean的依赖关系/">Spring IOC学习心得之注册bean的依赖关系</a>
+          </li>
+        
+          <li>
+            <a href="/2017/09/08/2017-09-08-Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)/">Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

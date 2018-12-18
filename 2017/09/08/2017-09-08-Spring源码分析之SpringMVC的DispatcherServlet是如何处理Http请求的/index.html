@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>Spring源码分析之SpringMVC的DispatcherServlet是如何处理Http请求的 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="一般我们会在web.xml文件中配置DispatcherServlet，比如如下配置方式：1234567891011121314&amp;lt;servlet&amp;gt;          &amp;lt;servlet-name&amp;gt;dispatcherServlet&amp;lt;/servlet-name&amp;gt;          &amp;lt;servlet-class&amp;gt;org.springframework.we">
+<meta name="keywords" content="Spring,Java,Linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring源码分析之SpringMVC的DispatcherServlet是如何处理Http请求的">
+<meta property="og:url" content="http://yoursite.com/2017/09/08/2017-09-08-Spring源码分析之SpringMVC的DispatcherServlet是如何处理Http请求的/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="一般我们会在web.xml文件中配置DispatcherServlet，比如如下配置方式：1234567891011121314&amp;lt;servlet&amp;gt;          &amp;lt;servlet-name&amp;gt;dispatcherServlet&amp;lt;/servlet-name&amp;gt;          &amp;lt;servlet-class&amp;gt;org.springframework.we">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-18T02:52:45.199Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring源码分析之SpringMVC的DispatcherServlet是如何处理Http请求的">
+<meta name="twitter:description" content="一般我们会在web.xml文件中配置DispatcherServlet，比如如下配置方式：1234567891011121314&amp;lt;servlet&amp;gt;          &amp;lt;servlet-name&amp;gt;dispatcherServlet&amp;lt;/servlet-name&amp;gt;          &amp;lt;servlet-class&amp;gt;org.springframework.we">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2017-09-08-Spring源码分析之SpringMVC的DispatcherServlet是如何处理Http请求的" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/09/08/2017-09-08-Spring源码分析之SpringMVC的DispatcherServlet是如何处理Http请求的/" class="article-date">
+  <time datetime="2017-09-07T16:00:00.000Z" itemprop="datePublished">2017-09-08</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Spring源码分析之SpringMVC的DispatcherServlet是如何处理Http请求的
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>一般我们会在web.xml文件中配置DispatcherServlet，比如如下配置方式：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;servlet&gt;  </span><br><span class="line">        &lt;servlet-name&gt;dispatcherServlet&lt;/servlet-name&gt;  </span><br><span class="line">        &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;  </span><br><span class="line">        &lt;init-param&gt;  </span><br><span class="line">            &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;  </span><br><span class="line">            &lt;param-value&gt;classpath:dispatcher-servlet.xml&lt;/param-value&gt;  </span><br><span class="line">        &lt;/init-param&gt;  </span><br><span class="line">        &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;  </span><br><span class="line">    &lt;/servlet&gt;  </span><br><span class="line">      </span><br><span class="line">    &lt;servlet-mapping&gt;  </span><br><span class="line">        &lt;servlet-name&gt;dispatcherServlet&lt;/servlet-name&gt;  </span><br><span class="line">        &lt;url-pattern&gt;/&lt;/url-pattern&gt;  </span><br><span class="line">    &lt;/servlet-mapping&gt;</span><br></pre></td></tr></table></figure></p>
+<p>上述代码配置了所有路径的http请求都会交给DispatcherServlet来处理<br>那么我们来看下DispatcherServlet的具体代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">@SuppressWarnings(&quot;serial&quot;)  </span><br><span class="line">public class DispatcherServlet extends FrameworkServlet &#123;  </span><br><span class="line">    public DispatcherServlet(WebApplicationContext webApplicationContext) &#123;  </span><br><span class="line">        super(webApplicationContext);  </span><br><span class="line">        setDispatchOptionsRequest(true);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    @Override  </span><br><span class="line">    protected void onRefresh(ApplicationContext context) &#123;  </span><br><span class="line">        initStrategies(context);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    /**  </span><br><span class="line">     * Initialize the strategy objects that this servlet uses.  </span><br><span class="line">     * &lt;p&gt;May be overridden in subclasses in order to initialize further strategy objects.  </span><br><span class="line">     */  </span><br><span class="line">    protected void initStrategies(ApplicationContext context) &#123;  </span><br><span class="line">        initMultipartResolver(context);  </span><br><span class="line">        initLocaleResolver(context);  </span><br><span class="line">        initThemeResolver(context);  </span><br><span class="line">        initHandlerMappings(context);  </span><br><span class="line">        initHandlerAdapters(context);  </span><br><span class="line">        initHandlerExceptionResolvers(context);  </span><br><span class="line">        initRequestToViewNameTranslator(context);  </span><br><span class="line">        initViewResolvers(context);  </span><br><span class="line">        initFlashMapManager(context);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">    @Override  </span><br><span class="line">    protected void doService(HttpServletRequest request, HttpServletResponse response) throws Exception &#123;  </span><br><span class="line">          </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">    protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception &#123;  </span><br><span class="line">          </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到这个类继承了FrameworkServlet类，再来看下这个类的代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line">@SuppressWarnings(&quot;serial&quot;)  </span><br><span class="line">public abstract class FrameworkServlet extends HttpServletBean implements ApplicationContextAware &#123;  </span><br><span class="line">  </span><br><span class="line">    @Override  </span><br><span class="line">    protected final void initServletBean() throws ServletException &#123;  </span><br><span class="line">          </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    protected WebApplicationContext initWebApplicationContext() &#123;  </span><br><span class="line">  </span><br><span class="line">        if (!this.refreshEventReceived) &#123;  </span><br><span class="line">            // Either the context is not a ConfigurableApplicationContext with refresh  </span><br><span class="line">            // support or the context injected at construction time had already been  </span><br><span class="line">            // refreshed -&gt; trigger initial onRefresh manually here.  </span><br><span class="line">            onRefresh(wac);  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">          </span><br><span class="line">    &#125;  </span><br><span class="line">    @Override  </span><br><span class="line">    public void destroy() &#123;  </span><br><span class="line">        getServletContext().log(&quot;Destroying Spring FrameworkServlet &apos;&quot; + getServletName() + &quot;&apos;&quot;);  </span><br><span class="line">        // Only call close() on WebApplicationContext if locally managed...  </span><br><span class="line">        if (this.webApplicationContext instanceof ConfigurableApplicationContext &amp;&amp; !this.webApplicationContextInjected) &#123;  </span><br><span class="line">            ((ConfigurableApplicationContext) this.webApplicationContext).close();  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">    /**  </span><br><span class="line">     * Override the parent class implementation in order to intercept PATCH requests.  </span><br><span class="line">     */  </span><br><span class="line">    @Override  </span><br><span class="line">    protected void service(HttpServletRequest request, HttpServletResponse response)  </span><br><span class="line">            throws ServletException, IOException &#123;  </span><br><span class="line">  </span><br><span class="line">        HttpMethod httpMethod = HttpMethod.resolve(request.getMethod());  </span><br><span class="line">        if (HttpMethod.PATCH == httpMethod || httpMethod == null) &#123;  </span><br><span class="line">            processRequest(request, response);  </span><br><span class="line">        &#125;  </span><br><span class="line">        else &#123;  </span><br><span class="line">            super.service(request, response);  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">      </span><br><span class="line">    @Override  </span><br><span class="line">    protected final void doGet(HttpServletRequest request, HttpServletResponse response)  </span><br><span class="line">            throws ServletException, IOException &#123;  </span><br><span class="line">  </span><br><span class="line">        processRequest(request, response);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">      </span><br><span class="line">    @Override  </span><br><span class="line">    protected final void doPost(HttpServletRequest request, HttpServletResponse response)  </span><br><span class="line">            throws ServletException, IOException &#123;  </span><br><span class="line">  </span><br><span class="line">        processRequest(request, response);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    protected final void processRequest(HttpServletRequest request, HttpServletResponse response)  </span><br><span class="line">            throws ServletException, IOException &#123;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到这个类继承了HttpServletBean类，而HttpServletBean类又继承了HttpServlet类，其中HttpServlet类的init，destroy，service三个方法负责管理Servlet的生命周期。<br>init方法：负责初始化Servlet对象<br>destroy方法：负责销毁Servlet对象<br>service方法：负责处理http请求<br>由于HttpServletBean实现了HttpServlet的init方法，可以看到该方法的代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">public final void init() throws ServletException &#123;  </span><br><span class="line">        if (logger.isDebugEnabled()) &#123;  </span><br><span class="line">            logger.debug(&quot;Initializing servlet &apos;&quot; + getServletName() + &quot;&apos;&quot;);  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        // Set bean properties from init parameters.  </span><br><span class="line">        // 获取servlet初始化的参数,对Bean属性进行配置  </span><br><span class="line">        try &#123;  </span><br><span class="line">            PropertyValues pvs = new ServletConfigPropertyValues(getServletConfig(), this.requiredProperties);  </span><br><span class="line">            BeanWrapper bw = PropertyAccessorFactory.forBeanPropertyAccess(this);  </span><br><span class="line">            ResourceLoader resourceLoader = new ServletContextResourceLoader(getServletContext());  </span><br><span class="line">            bw.registerCustomEditor(Resource.class, new ResourceEditor(resourceLoader, getEnvironment()));  </span><br><span class="line">            initBeanWrapper(bw);  </span><br><span class="line">            bw.setPropertyValues(pvs, true);  </span><br><span class="line">        &#125;  </span><br><span class="line">        catch (BeansException ex) &#123;  </span><br><span class="line">            logger.error(&quot;Failed to set bean properties on servlet &apos;&quot; + getServletName() + &quot;&apos;&quot;, ex);  </span><br><span class="line">            throw ex;  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        // Let subclasses do whatever initialization they like.  </span><br><span class="line">        // 调用子类的initServletBean进行具体的初始化  </span><br><span class="line">        initServletBean();  </span><br><span class="line">  </span><br><span class="line">        if (logger.isDebugEnabled()) &#123;  </span><br><span class="line">            logger.debug(&quot;Servlet &apos;&quot; + getServletName() + &quot;&apos; configured successfully&quot;);  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里会读取配置在ServletContext中的Bean属性参数，这里可以看到对PropertyValues和BeanWrapper的使用，这里就完成了对Servlet的初始化<br>接着调用了initServletBean方法来初始化DispatcherServlet持有的IOC容器，当然底层其实是调用initWebApplicationContext方法来初始化，其代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">protected WebApplicationContext initWebApplicationContext() &#123;  </span><br><span class="line">        // 得到根上下文,这个根上下文是保存在ServletContext中的,使用这个根上下文作为当前MVC上下文的双亲上下文,当前的上下文就是wac  </span><br><span class="line">        // cwac.setParent(rootContext)就是设置当前上下文的根上下文  </span><br><span class="line">        WebApplicationContext rootContext =  </span><br><span class="line">                WebApplicationContextUtils.getWebApplicationContext(getServletContext());  </span><br><span class="line">        WebApplicationContext wac = null;  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">        if (wac == null) &#123;  </span><br><span class="line">            // No context instance is defined for this servlet -&gt; create a local one  </span><br><span class="line">            wac = createWebApplicationContext(rootContext);  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        if (!this.refreshEventReceived) &#123;  </span><br><span class="line">            // Either the context is not a ConfigurableApplicationContext with refresh  </span><br><span class="line">            // support or the context injected at construction time had already been  </span><br><span class="line">            // refreshed -&gt; trigger initial onRefresh manually here.  </span><br><span class="line">            onRefresh(wac);  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到createWebApplicationContext方法就是在创建并初始化IOC容器，代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">protected WebApplicationContext createWebApplicationContext(ApplicationContext parent) &#123;  </span><br><span class="line">          </span><br><span class="line">        //设置IOC容器的各个参数  </span><br><span class="line">        wac.setEnvironment(getEnvironment());  </span><br><span class="line">        wac.setParent(parent);  </span><br><span class="line">        wac.setConfigLocation(getContextConfigLocation());  </span><br><span class="line">  </span><br><span class="line">        configureAndRefreshWebApplicationContext(wac);  </span><br><span class="line">  </span><br><span class="line">        return wac;  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里设置了当前IOC容器上下文的双亲上下文，双亲上下文是如下方法获取到的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">WebApplicationContext rootContext =  </span><br><span class="line">                WebApplicationContextUtils.getWebApplicationContext(getServletContext());</span><br></pre></td></tr></table></figure></p>
+<p>这样当从IOC容器中getBean的时候会先从其双亲上下文中获取bean,configureAndRefreshWebApplicationContext方法里面调用了wac.refresh()，也就是refresh方法来真正启动对IOC容器的初始化，这里就跟IOC容器的初始化保持一致了</p>
+<p>到这里，对DispatcherServlet所持有的IOC容器的初始化就完成了，初始化完成后，DispatcherServlet就持有一个以自己的Servlet名称命名的IOC容器了，这个IOC容器是一个WebApplicationContext对象。<br>我们还可以看到initWebApplicationContext方法中还调用了onrefresh方法，该方法是由DispatcherServlet来实现的，并最终调用了DispatcherServlet的如下方法来进行初始化：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">protected void initStrategies(ApplicationContext context) &#123;  </span><br><span class="line">        initMultipartResolver(context);  </span><br><span class="line">        initLocaleResolver(context);  </span><br><span class="line">        initThemeResolver(context);  </span><br><span class="line">        initHandlerMappings(context);  </span><br><span class="line">        initHandlerAdapters(context);  </span><br><span class="line">        initHandlerExceptionResolvers(context);  </span><br><span class="line">        initRequestToViewNameTranslator(context);  </span><br><span class="line">        initViewResolvers(context);  </span><br><span class="line">        initFlashMapManager(context);  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>在这个方法里，DispatcherServlet对MVC模块的其他部分进行了初始化，比如handlerMapping，ViewResolver等，它是启动整个Spring MVC框架的初始化<br>比如，支持国际化的LocalResolver，支持request映射的HandlerMapping，以及视图生成的ViewResolver等的初始化<br>这里的initHandlerMapping是为HTTP请求找到相应的Controller控制器。<br>DispatcherServlet的整个初始化过程就到这里结束了，下面说下DispatcherServlet是如何处理http请求的</p>
+<p>首先http请求是由doService来处理的，那么我们可以看下HttpServlet类的该方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;  </span><br><span class="line">        String method = req.getMethod();  </span><br><span class="line">        long errMsg;  </span><br><span class="line">        if(method.equals(&quot;GET&quot;)) &#123;  </span><br><span class="line">            errMsg = this.getLastModified(req);  </span><br><span class="line">            if(errMsg == -1L) &#123;  </span><br><span class="line">                this.doGet(req, resp);  </span><br><span class="line">            &#125; else &#123;  </span><br><span class="line">                long ifModifiedSince = req.getDateHeader(&quot;If-Modified-Since&quot;);  </span><br><span class="line">                if(ifModifiedSince &lt; errMsg) &#123;  </span><br><span class="line">                    this.maybeSetLastModified(resp, errMsg);  </span><br><span class="line">                    this.doGet(req, resp);  </span><br><span class="line">                &#125; else &#123;  </span><br><span class="line">                    resp.setStatus(304);  </span><br><span class="line">                &#125;  </span><br><span class="line">            &#125;  </span><br><span class="line">        &#125; else if(method.equals(&quot;HEAD&quot;)) &#123;  </span><br><span class="line">            errMsg = this.getLastModified(req);  </span><br><span class="line">            this.maybeSetLastModified(resp, errMsg);  </span><br><span class="line">            this.doHead(req, resp);  </span><br><span class="line">        &#125; else if(method.equals(&quot;POST&quot;)) &#123;  </span><br><span class="line">            this.doPost(req, resp);  </span><br><span class="line">        &#125; else if(method.equals(&quot;PUT&quot;)) &#123;  </span><br><span class="line">            this.doPut(req, resp);  </span><br><span class="line">        &#125; else if(method.equals(&quot;DELETE&quot;)) &#123;  </span><br><span class="line">            this.doDelete(req, resp);  </span><br><span class="line">        &#125; else if(method.equals(&quot;OPTIONS&quot;)) &#123;  </span><br><span class="line">            this.doOptions(req, resp);  </span><br><span class="line">        &#125; else if(method.equals(&quot;TRACE&quot;)) &#123;  </span><br><span class="line">            this.doTrace(req, resp);  </span><br><span class="line">        &#125; else &#123;  </span><br><span class="line">            String errMsg1 = lStrings.getString(&quot;http.method_not_implemented&quot;);  </span><br><span class="line">            Object[] errArgs = new Object[]&#123;method&#125;;  </span><br><span class="line">            errMsg1 = MessageFormat.format(errMsg1, errArgs);  </span><br><span class="line">            resp.sendError(501, errMsg1);  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>这个方法里面会根据不同的请求类型，来调用不同的处理方法，比如会调用doGet或者doPost方法来分别处理get请求和post请求，跟踪这些方法，可以发现，最终是调用了DispatcherServlet的doService方法，代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">protected void doService(HttpServletRequest request, HttpServletResponse response) throws Exception &#123;  </span><br><span class="line">        try &#123;  </span><br><span class="line">            this.doDispatch(request, response);  </span><br><span class="line">        &#125; finally &#123;  </span><br><span class="line">            if(!WebAsyncUtils.getAsyncManager(request).isConcurrentHandlingStarted() &amp;&amp; attributesSnapshot1 != null) &#123;  </span><br><span class="line">                this.restoreAttributesAfterInclude(request, attributesSnapshot1);  </span><br><span class="line">            &#125;  </span><br><span class="line">  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到该方法调用了doDispatch来进行处理，doDispatch是MVC模式的主要部分</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/09/08/2017-09-08-Spring源码分析之SpringMVC的DispatcherServlet是如何处理Http请求的/" data-id="cjpt5le6w001e29mzn0r4lbqt" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/09/08/2017-09-08-Spring IOC学习心得之BeanPostProcessor，BeanNameAware，BeanClassLoaderAware，BeanFactoryAware接口是如何起作用的/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Spring IOC学习心得之BeanPostProcessor，BeanNameAware，BeanClassLoaderAware，BeanFactoryAware接口是如何起作用的
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/09/08/2017-09-08-Spring源码分析之doDispatch分发请求逻辑/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Spring源码分析之doDispatch分发请求逻辑</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/12/18/��һƪ���/">��һƪ���</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/18/my-site/">my_site</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/18/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2017/09/08/2017-09-08-Spring IOC学习心得之注册bean的依赖关系/">Spring IOC学习心得之注册bean的依赖关系</a>
+          </li>
+        
+          <li>
+            <a href="/2017/09/08/2017-09-08-Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)/">Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

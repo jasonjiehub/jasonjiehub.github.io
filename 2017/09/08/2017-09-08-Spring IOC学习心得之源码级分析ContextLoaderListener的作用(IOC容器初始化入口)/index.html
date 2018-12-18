@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口) | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="ContextLoaderListener类是负责初始化IOC容器，即在我们的web项目中，这里就是IOC容器初始化的入口，由这个类启动IOC容器的初始化。它配置在web.xml中，比如如下配置：123456789&amp;lt;context-param&amp;gt;          &amp;lt;param-name&amp;gt;contextConfigLocation&amp;lt;/param-name&amp;gt;">
+<meta name="keywords" content="Spring,Java,Linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)">
+<meta property="og:url" content="http://yoursite.com/2017/09/08/2017-09-08-Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="ContextLoaderListener类是负责初始化IOC容器，即在我们的web项目中，这里就是IOC容器初始化的入口，由这个类启动IOC容器的初始化。它配置在web.xml中，比如如下配置：123456789&amp;lt;context-param&amp;gt;          &amp;lt;param-name&amp;gt;contextConfigLocation&amp;lt;/param-name&amp;gt;">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-18T02:52:45.199Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)">
+<meta name="twitter:description" content="ContextLoaderListener类是负责初始化IOC容器，即在我们的web项目中，这里就是IOC容器初始化的入口，由这个类启动IOC容器的初始化。它配置在web.xml中，比如如下配置：123456789&amp;lt;context-param&amp;gt;          &amp;lt;param-name&amp;gt;contextConfigLocation&amp;lt;/param-name&amp;gt;">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2017-09-08-Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/09/08/2017-09-08-Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)/" class="article-date">
+  <time datetime="2017-09-07T16:00:00.000Z" itemprop="datePublished">2017-09-08</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>ContextLoaderListener类是负责初始化IOC容器，即在我们的web项目中，这里就是IOC容器初始化的入口，由这个类启动IOC容器的初始化。<br>它配置在web.xml中，比如如下配置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;context-param&gt;  </span><br><span class="line">        &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;  </span><br><span class="line">        &lt;param-value&gt;classpath:context/applicationContext.xml&lt;/param-value&gt;  </span><br><span class="line">    &lt;/context-param&gt;  </span><br><span class="line">  </span><br><span class="line">    &lt;!-- Spring监听器 --&gt;  </span><br><span class="line">    &lt;listener&gt;  </span><br><span class="line">        &lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;/listener-class&gt;  </span><br><span class="line">    &lt;/listener&gt;</span><br></pre></td></tr></table></figure></p>
+<p>跟踪ContextLoaderListener类，可以看到有一个如下方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">protected void configureAndRefreshWebApplicationContext(ConfigurableWebApplicationContext wac, ServletContext sc) &#123;  </span><br><span class="line">        String configLocationParam;  </span><br><span class="line">        if(ObjectUtils.identityToString(wac).equals(wac.getId())) &#123;  </span><br><span class="line">            configLocationParam = sc.getInitParameter(&quot;contextId&quot;);  </span><br><span class="line">            if(configLocationParam != null) &#123;  </span><br><span class="line">                wac.setId(configLocationParam);  </span><br><span class="line">            &#125; else &#123;  </span><br><span class="line">                wac.setId(ConfigurableWebApplicationContext.APPLICATION_CONTEXT_ID_PREFIX + ObjectUtils.getDisplayString(sc.getContextPath()));  </span><br><span class="line">            &#125;  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        wac.setServletContext(sc);  </span><br><span class="line">        configLocationParam = sc.getInitParameter(&quot;contextConfigLocation&quot;); //很显然这里就是读取web.xml中配置的资源文件的路径，也就是上述context-param  </span><br><span class="line">标签配置的参数  </span><br><span class="line">        if(configLocationParam != null) &#123;  </span><br><span class="line">            wac.setConfigLocation(configLocationParam);  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        ConfigurableEnvironment env = wac.getEnvironment();  </span><br><span class="line">        if(env instanceof ConfigurableWebEnvironment) &#123;  </span><br><span class="line">            ((ConfigurableWebEnvironment)env).initPropertySources(sc, (ServletConfig)null);  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        this.customizeContext(sc, wac);  </span><br><span class="line">        wac.refresh();  //有了资源文件后，在这里开启IOC容器的初始化  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>refresh方法的实现是在AbstractApplicationContext类中，代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">public void refresh() throws BeansException, IllegalStateException &#123;  </span><br><span class="line">        Object var1 = this.startupShutdownMonitor;  </span><br><span class="line">        synchronized(this.startupShutdownMonitor) &#123;  </span><br><span class="line">            this.prepareRefresh();  </span><br><span class="line">            ConfigurableListableBeanFactory beanFactory = this.obtainFreshBeanFactory();  </span><br><span class="line">            this.prepareBeanFactory(beanFactory);  </span><br><span class="line">  </span><br><span class="line">            try &#123;  </span><br><span class="line">                this.postProcessBeanFactory(beanFactory);  </span><br><span class="line">                this.invokeBeanFactoryPostProcessors(beanFactory);  </span><br><span class="line">                this.registerBeanPostProcessors(beanFactory);  </span><br><span class="line">                this.initMessageSource();  </span><br><span class="line">                this.initApplicationEventMulticaster();  </span><br><span class="line">                this.onRefresh();  </span><br><span class="line">                this.registerListeners();  </span><br><span class="line">                this.finishBeanFactoryInitialization(beanFactory);  </span><br><span class="line">                this.finishRefresh();  </span><br><span class="line">            &#125; catch (BeansException var9) &#123;  </span><br><span class="line">                if(this.logger.isWarnEnabled()) &#123;  </span><br><span class="line">                    this.logger.warn(&quot;Exception encountered during context initialization - cancelling refresh attempt: &quot; + var9);  </span><br><span class="line">                &#125;  </span><br><span class="line">  </span><br><span class="line">                this.destroyBeans();  </span><br><span class="line">                this.cancelRefresh(var9);  </span><br><span class="line">                throw var9;  </span><br><span class="line">            &#125; finally &#123;  </span><br><span class="line">                this.resetCommonCaches();  </span><br><span class="line">            &#125;  </span><br><span class="line">  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>上述代码就会进行完整的IOC容器的初始化</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/09/08/2017-09-08-Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)/" data-id="cjpt5le2h000529mzsp7dg6jn" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/09/08/2017-09-08-Spring IOC学习心得之注册bean的依赖关系/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Spring IOC学习心得之注册bean的依赖关系
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/09/08/2017-09-08-Spring源码分析之Aop中拦截器,适配器,通知之间的关系/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Spring源码分析之Aop中拦截器,适配器,通知之间的关系</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/12/18/��һƪ���/">��һƪ���</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/18/my-site/">my_site</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/18/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2017/09/08/2017-09-08-Spring IOC学习心得之注册bean的依赖关系/">Spring IOC学习心得之注册bean的依赖关系</a>
+          </li>
+        
+          <li>
+            <a href="/2017/09/08/2017-09-08-Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)/">Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

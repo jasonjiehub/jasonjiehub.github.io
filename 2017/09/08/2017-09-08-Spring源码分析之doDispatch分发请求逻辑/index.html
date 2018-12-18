@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>Spring源码分析之doDispatch分发请求逻辑 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="首先，我的另外一篇博客已经讲述了DispatcherServlet的整个初始化过程，地址如下：http://blog.csdn.net/u011734144/article/details/74136168 下面说说DispatcherServlet是如何分发请求的分发请求是由该类的doDispatch方法来完成的，先看下具体代码1234567891011121314151617181920212">
+<meta name="keywords" content="Spring,Java,Linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring源码分析之doDispatch分发请求逻辑">
+<meta property="og:url" content="http://yoursite.com/2017/09/08/2017-09-08-Spring源码分析之doDispatch分发请求逻辑/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="首先，我的另外一篇博客已经讲述了DispatcherServlet的整个初始化过程，地址如下：http://blog.csdn.net/u011734144/article/details/74136168 下面说说DispatcherServlet是如何分发请求的分发请求是由该类的doDispatch方法来完成的，先看下具体代码1234567891011121314151617181920212">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-18T02:52:45.199Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring源码分析之doDispatch分发请求逻辑">
+<meta name="twitter:description" content="首先，我的另外一篇博客已经讲述了DispatcherServlet的整个初始化过程，地址如下：http://blog.csdn.net/u011734144/article/details/74136168 下面说说DispatcherServlet是如何分发请求的分发请求是由该类的doDispatch方法来完成的，先看下具体代码1234567891011121314151617181920212">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2017-09-08-Spring源码分析之doDispatch分发请求逻辑" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/09/08/2017-09-08-Spring源码分析之doDispatch分发请求逻辑/" class="article-date">
+  <time datetime="2017-09-07T16:00:00.000Z" itemprop="datePublished">2017-09-08</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Spring源码分析之doDispatch分发请求逻辑
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>首先，我的另外一篇博客已经讲述了DispatcherServlet的整个初始化过程，地址如下：<br><a href="http://blog.csdn.net/u011734144/article/details/74136168" target="_blank" rel="noopener">http://blog.csdn.net/u011734144/article/details/74136168</a></p>
+<p>下面说说DispatcherServlet是如何分发请求的<br>分发请求是由该类的doDispatch方法来完成的，先看下具体代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception &#123;</span><br><span class="line">		HttpServletRequest processedRequest = request;</span><br><span class="line">		HandlerExecutionChain mappedHandler = null;</span><br><span class="line">		boolean multipartRequestParsed = false;</span><br><span class="line"></span><br><span class="line">		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);</span><br><span class="line"></span><br><span class="line">		try &#123;</span><br><span class="line">			// 这里为视图准备好一个ModelAndView,这个ModelAndView持有handler处理请求的结果</span><br><span class="line">			ModelAndView mv = null;</span><br><span class="line">			Exception dispatchException = null;</span><br><span class="line"></span><br><span class="line">			try &#123;</span><br><span class="line">				processedRequest = checkMultipart(request);</span><br><span class="line">				multipartRequestParsed = (processedRequest != request);</span><br><span class="line"></span><br><span class="line">				// Determine handler for the current request.</span><br><span class="line">				// 根据请求得到对应的Handler</span><br><span class="line">				mappedHandler = getHandler(processedRequest);</span><br><span class="line">				if (mappedHandler == null || mappedHandler.getHandler() == null) &#123;</span><br><span class="line">					noHandlerFound(processedRequest, response);</span><br><span class="line">					return;</span><br><span class="line">				&#125;</span><br><span class="line"></span><br><span class="line">				// Determine handler adapter for the current request.</span><br><span class="line">				// 这里是实际调用handler的地方,在执行handler之前,用handlerAdapter先先检查一下handler的合法性: 即是不是按spring的要求编写的handler</span><br><span class="line">				// handler处理的结果封装到ModelAndView中,为视图提供展现数据</span><br><span class="line">				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());</span><br><span class="line"></span><br><span class="line">				// Process last-modified header, if supported by the handler.</span><br><span class="line">				String method = request.getMethod();</span><br><span class="line">				boolean isGet = &quot;GET&quot;.equals(method);</span><br><span class="line">				if (isGet || &quot;HEAD&quot;.equals(method)) &#123;</span><br><span class="line">					long lastModified = ha.getLastModified(request, mappedHandler.getHandler());</span><br><span class="line">					if (logger.isDebugEnabled()) &#123;</span><br><span class="line">						logger.debug(&quot;Last-Modified value for [&quot; + getRequestUri(request) + &quot;] is: &quot; + lastModified);</span><br><span class="line">					&#125;</span><br><span class="line">					if (new ServletWebRequest(request, response).checkNotModified(lastModified) &amp;&amp; isGet) &#123;</span><br><span class="line">						return;</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line"></span><br><span class="line">				if (!mappedHandler.applyPreHandle(processedRequest, response)) &#123;</span><br><span class="line">					return;</span><br><span class="line">				&#125;</span><br><span class="line"></span><br><span class="line">				// Actually invoke the handler.</span><br><span class="line">				// 通过调用handlerAdapter的handle方法,实际上触发对Controller的handleRequest方法的调用</span><br><span class="line">				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());</span><br><span class="line"></span><br><span class="line">				if (asyncManager.isConcurrentHandlingStarted()) &#123;</span><br><span class="line">					return;</span><br><span class="line">				&#125;</span><br><span class="line"></span><br><span class="line">				applyDefaultViewName(processedRequest, mv);</span><br><span class="line">				mappedHandler.applyPostHandle(processedRequest, response, mv);</span><br><span class="line">			&#125;</span><br><span class="line">			</span><br><span class="line">			processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);</span><br><span class="line">		&#125;</span><br><span class="line">	</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure></p>
+<p>首先可以看到，这里为视图准备好一个ModelAndView,这个ModelAndView持有handler处理请求的结果<br>然后如下代码：<br>mappedHandler = getHandler(processedRequest)<br>可以根据请求得到对应的handler，如果获取不到对应的handler，就会调用noHandlerFound方法来进行处理，表示找不到对应的处理器，从而抛出异常<br>在执行handler之前,用handlerAdapter先先检查一下handler的合法性: 即是不是按spring的要求编写的handler，即需要判断这个handler是不是Controller接口的实现<br>这个判断是通过HandlerAdapter来判断的，以SimpleControllerHandlerAdapter的实现为例来了解这个判断是如何起作用的，这个判断是通过support方法来实现，<br>判断当前的handler是不是Controller对象，具体代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">public class SimpleControllerHandlerAdapter implements HandlerAdapter &#123;</span><br><span class="line"></span><br><span class="line">	// 判断将要调用handler是不是controller</span><br><span class="line">	@Override</span><br><span class="line">	public boolean supports(Object handler) &#123;</span><br><span class="line">		return (handler instanceof Controller);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	@Override</span><br><span class="line">	public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler)</span><br><span class="line">			throws Exception &#123;</span><br><span class="line">		//对http请求响应的处理.生成各种需要的数据,并把这些数据封装到ModelAndView中去</span><br><span class="line">		return ((Controller) handler).handleRequest(request, response);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	@Override</span><br><span class="line">	public long getLastModified(HttpServletRequest request, Object handler) &#123;</span><br><span class="line">		if (handler instanceof LastModified) &#123;</span><br><span class="line">			return ((LastModified) handler).getLastModified(request);</span><br><span class="line">		&#125;</span><br><span class="line">		return -1L;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来mappedHandler.applyPreHandle方法，代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">boolean applyPreHandle(HttpServletRequest request, HttpServletResponse response) throws Exception &#123;</span><br><span class="line">		HandlerInterceptor[] interceptors = getInterceptors();</span><br><span class="line">		if (!ObjectUtils.isEmpty(interceptors)) &#123;</span><br><span class="line">			for (int i = 0; i &lt; interceptors.length; i++) &#123;</span><br><span class="line">				HandlerInterceptor interceptor = interceptors[i];</span><br><span class="line">				if (!interceptor.preHandle(request, response, this.handler)) &#123;</span><br><span class="line">					triggerAfterCompletion(request, response, null);</span><br><span class="line">					return false;</span><br><span class="line">				&#125;</span><br><span class="line">				this.interceptorIndex = i;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		return true;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这是调用为handler配置的拦截器，从HanlderExecutionChain中取出所有的拦截器Interceptor进行前置处理<br>mv = ha.handle(processedRequest, response, mappedHandler.getHandler()); 是真正调用handler进行处理的地方，实际是触发对Controller的<br>handleRequest方法的调用来进行http请求的处理<br>mappedHandler.applyPostHandle方法与前置处理方法applyPreHandle类似，是handle的拦截器的后置处理，具体代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">void applyPostHandle(HttpServletRequest request, HttpServletResponse response, ModelAndView mv) throws Exception &#123;</span><br><span class="line">		HandlerInterceptor[] interceptors = getInterceptors();</span><br><span class="line">		if (!ObjectUtils.isEmpty(interceptors)) &#123;</span><br><span class="line">			for (int i = interceptors.length - 1; i &gt;= 0; i--) &#123;</span><br><span class="line">				HandlerInterceptor interceptor = interceptors[i];</span><br><span class="line">				interceptor.postHandle(request, response, this.handler, mv);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure></p>
+<p>最后的processDispatchResult方法就是使用视图对ModelAndView数据的展现<br>到这里，主流程我们就分析完了。<br>接下来我们看下具体的获取handler的过程，也就是getHandler方法的代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">protected HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception &#123;</span><br><span class="line">		// 这里是从HandlerMapping中去取handler的调用</span><br><span class="line">		for (HandlerMapping hm : this.handlerMappings) &#123;</span><br><span class="line">			if (logger.isTraceEnabled()) &#123;</span><br><span class="line">				logger.trace(</span><br><span class="line">						&quot;Testing handler map [&quot; + hm + &quot;] in DispatcherServlet with name &apos;&quot; + getServletName() + &quot;&apos;&quot;);</span><br><span class="line">			&#125;</span><br><span class="line">			HandlerExecutionChain handler = hm.getHandler(request);</span><br><span class="line">			if (handler != null) &#123;</span><br><span class="line">				return handler;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		return null;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到它其实就是从handlerMappings中获取对应的处理器，也就是遍历当前所持有的所有的HanlderMapping，因为在DispatcherServlet中可能定义了不止一个<br>handlerMapping，在这一系列handlerMapping中只要找到了一个需要的handler，就会停止查找，在找到了handler以后，通过hanler返回的是一个HandlerExecutionChain<br>对象，其中包含了最终的Controller和定义的一个拦截器链，拦截器链是为了对handler其实也就是目标Controller进行增强。这样就会按照上面的步骤，先来调用拦截器链的前置处理方法，然后调用Controller来进行请求处理，然后调用<br>拦截器链的后置处理方法。<br>那么接下来我们想知道的就是handlerMappings中的拦截器链和Controller是何时注册进去的<br>下面我们以HandlerMapping的其中一个实现SimpleUrlHandlerMapping来进行讲解，根据名字，可以看出他是根据Url来进行映射，并注册Handler和Interceptor，从而<br>维护一个反映这种url到handler和Interceptor的映射关系的handlerMap，当需要匹配Http请求的时候就需要查询这个handlerMap中的信息来得到对应的<br>HandlerExecutionChain，而这个对象里面就封装了url对应的handler和Interceptor，这个过程就是在SimpleUrlHandlerMapping的如下方法中完成的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public void initApplicationContext() throws BeansException &#123;</span><br><span class="line">   super.initApplicationContext();</span><br><span class="line">   registerHandlers(this.urlMap);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">public abstract class ApplicationObjectSupport implements ApplicationContextAware &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	@Override</span><br><span class="line">	public final void setApplicationContext(ApplicationContext context) throws BeansException &#123;</span><br><span class="line">		if (context == null &amp;&amp; !isContextRequired()) &#123;</span><br><span class="line">			// Reset internal context state.</span><br><span class="line">			this.applicationContext = null;</span><br><span class="line">			this.messageSourceAccessor = null;</span><br><span class="line">		&#125;</span><br><span class="line">		else if (this.applicationContext == null) &#123;</span><br><span class="line">			// Initialize with passed-in context.</span><br><span class="line">			if (!requiredContextClass().isInstance(context)) &#123;</span><br><span class="line">				throw new ApplicationContextException(</span><br><span class="line">						&quot;Invalid application context: needs to be of type [&quot; + requiredContextClass().getName() + &quot;]&quot;);</span><br><span class="line">			&#125;</span><br><span class="line">			this.applicationContext = context;</span><br><span class="line">			this.messageSourceAccessor = new MessageSourceAccessor(context);</span><br><span class="line">			initApplicationContext(context);</span><br><span class="line">		&#125;</span><br><span class="line">		else &#123;</span><br><span class="line">			// Ignore reinitialization if same context passed in.</span><br><span class="line">			if (this.applicationContext != context) &#123;</span><br><span class="line">				throw new ApplicationContextException(</span><br><span class="line">						&quot;Cannot reinitialize with different application context: current one is [&quot; +</span><br><span class="line">						this.applicationContext + &quot;], passed-in one is [&quot; + context + &quot;]&quot;);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到这个类实现了ApplicationContextAware接口，我们知道在类进行初始化的时候，系统会自动帮我们调用ApplicationContextAware类的<br>setApplicationContext方法，来让bean获取对IOC容器的感知，这个调用在我的其他文章中也有具体的介绍，这里不做过多的说明。我们可以看到这个方法里面就是调用<br>initApplicationContext的地方，即这里来完成启动对映射关系的注册</p>
+<p>接着说上面的初始化方法，其中的registerHandlers方法其实是调用的基类AbstractUrlHandlerMapping的registerHandlers方法来进行的注册，具体代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">protected void registerHandler(String urlPath, Object handler) throws BeansException, IllegalStateException &#123;</span><br><span class="line">		Assert.notNull(urlPath, &quot;URL path must not be null&quot;);</span><br><span class="line">		Assert.notNull(handler, &quot;Handler object must not be null&quot;);</span><br><span class="line">		Object resolvedHandler = handler;</span><br><span class="line"></span><br><span class="line">		// Eagerly resolve handler if referencing singleton via name.</span><br><span class="line">		// 如果直接使用bean名称进行映射,那就直接从容器中获取handler</span><br><span class="line">		if (!this.lazyInitHandlers &amp;&amp; handler instanceof String) &#123;</span><br><span class="line">			String handlerName = (String) handler;</span><br><span class="line">			if (getApplicationContext().isSingleton(handlerName)) &#123;</span><br><span class="line">				resolvedHandler = getApplicationContext().getBean(handlerName);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		Object mappedHandler = this.handlerMap.get(urlPath);</span><br><span class="line">		if (mappedHandler != null) &#123;</span><br><span class="line">			if (mappedHandler != resolvedHandler) &#123;</span><br><span class="line">				throw new IllegalStateException(</span><br><span class="line">						&quot;Cannot map &quot; + getHandlerDescription(handler) + &quot; to URL path [&quot; + urlPath +</span><br><span class="line">						&quot;]: There is already &quot; + getHandlerDescription(mappedHandler) + &quot; mapped.&quot;);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		else &#123;</span><br><span class="line">			// 处理URL是&quot;/&quot;的映射,把这个&quot;/&quot;映射的controller设置到rootHandler中</span><br><span class="line">			if (urlPath.equals(&quot;/&quot;)) &#123;</span><br><span class="line">				if (logger.isInfoEnabled()) &#123;</span><br><span class="line">					logger.info(&quot;Root mapping to &quot; + getHandlerDescription(handler));</span><br><span class="line">				&#125;</span><br><span class="line">				setRootHandler(resolvedHandler);</span><br><span class="line">			&#125;</span><br><span class="line">			// 处理URL是&quot;/*&quot;的映射,把这个&quot;/&quot;映射的controller设置到defaultHandler中</span><br><span class="line">			else if (urlPath.equals(&quot;/*&quot;)) &#123;</span><br><span class="line">				if (logger.isInfoEnabled()) &#123;</span><br><span class="line">					logger.info(&quot;Default mapping to &quot; + getHandlerDescription(handler));</span><br><span class="line">				&#125;</span><br><span class="line">				setDefaultHandler(resolvedHandler);</span><br><span class="line">			&#125;</span><br><span class="line">			// 处理正常的URL映射,设置handlerMap的key和value,分别对应于URL和映射的controller</span><br><span class="line">			else &#123;</span><br><span class="line">				this.handlerMap.put(urlPath, resolvedHandler);</span><br><span class="line">				if (logger.isInfoEnabled()) &#123;</span><br><span class="line">					logger.info(&quot;Mapped URL path [&quot; + urlPath + &quot;] onto &quot; + getHandlerDescription(handler));</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在这个处理过程中，如果使用Bean的名称作为映射，那么直接从容器中获取这个Http映射对应的Bean，然后还要对不同的URL配置进行解析处理，比如在Http请求中配置<br>成“/”和通配符“/*”的URL，以及正常的URL请求，完成这个解析处理过程以后，会把URL和handler作为键值对放到上面说到的handlerMap中去，handlerMap其实就是<br>一个hashMap，其中保存了URL请求到Controller的映射关系，这个handlerMap是在AbstractUrlHandlerMapping中定义的</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/09/08/2017-09-08-Spring源码分析之doDispatch分发请求逻辑/" data-id="cjpt5le6y001g29mzovd02l0r" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/09/08/2017-09-08-Spring源码分析之SpringMVC的DispatcherServlet是如何处理Http请求的/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Spring源码分析之SpringMVC的DispatcherServlet是如何处理Http请求的
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/09/08/2017-09-08-Spring源码分析之ProxyFactoryBean方式实现Aop功能的分析/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Spring源码分析之ProxyFactoryBean方式实现Aop功能的分析</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/12/18/��һƪ���/">��һƪ���</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/18/my-site/">my_site</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/18/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2017/09/08/2017-09-08-Spring IOC学习心得之注册bean的依赖关系/">Spring IOC学习心得之注册bean的依赖关系</a>
+          </li>
+        
+          <li>
+            <a href="/2017/09/08/2017-09-08-Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)/">Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
