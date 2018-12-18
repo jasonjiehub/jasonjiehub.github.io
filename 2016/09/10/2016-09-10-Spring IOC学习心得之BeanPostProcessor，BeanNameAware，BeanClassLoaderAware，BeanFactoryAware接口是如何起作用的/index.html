@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="Spring,Java,Linux,">
 
 
 
@@ -79,17 +79,18 @@
 
 
 
-<meta name="description" content="tags: - Spring - Java - Linux   首先说下BeanPostProcessor接口中的两个方法，如下：1234567891011121314package org.springframework.beans.factory.config;    import org.springframework.beans.BeansException;      public in">
+<meta name="description" content="首先说下BeanPostProcessor接口中的两个方法，如下：1234567891011121314package org.springframework.beans.factory.config;    import org.springframework.beans.BeansException;      public interface BeanPostProcessor &amp;#123">
+<meta name="keywords" content="Spring,Java,Linux">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spring IOC学习心得之BeanPostProcessor，BeanNameAware，BeanClassLoaderAware，BeanFactoryAware接口是如何起作用的">
 <meta property="og:url" content="http://denglinjie.com/2016/09/10/2016-09-10-Spring IOC学习心得之BeanPostProcessor，BeanNameAware，BeanClassLoaderAware，BeanFactoryAware接口是如何起作用的/index.html">
 <meta property="og:site_name" content="jasonjie">
-<meta property="og:description" content="tags: - Spring - Java - Linux   首先说下BeanPostProcessor接口中的两个方法，如下：1234567891011121314package org.springframework.beans.factory.config;    import org.springframework.beans.BeansException;      public in">
+<meta property="og:description" content="首先说下BeanPostProcessor接口中的两个方法，如下：1234567891011121314package org.springframework.beans.factory.config;    import org.springframework.beans.BeansException;      public interface BeanPostProcessor &amp;#123">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-12-18T05:06:25.228Z">
+<meta property="og:updated_time" content="2018-12-18T05:16:39.498Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spring IOC学习心得之BeanPostProcessor，BeanNameAware，BeanClassLoaderAware，BeanFactoryAware接口是如何起作用的">
-<meta name="twitter:description" content="tags: - Spring - Java - Linux   首先说下BeanPostProcessor接口中的两个方法，如下：1234567891011121314package org.springframework.beans.factory.config;    import org.springframework.beans.BeansException;      public in">
+<meta name="twitter:description" content="首先说下BeanPostProcessor接口中的两个方法，如下：1234567891011121314package org.springframework.beans.factory.config;    import org.springframework.beans.BeansException;      public interface BeanPostProcessor &amp;#123">
 
 
 
@@ -351,12 +352,7 @@
       
 
       
-        <p>tags:</p>
-<pre><code>- Spring
-- Java
-- Linux
-</code></pre><hr>
-<ol>
+        <ol>
 <li>首先说下BeanPostProcessor接口中的两个方法，如下：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">package org.springframework.beans.factory.config;  </span><br><span class="line">  </span><br><span class="line">import org.springframework.beans.BeansException;  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">public interface BeanPostProcessor &#123;  </span><br><span class="line">  </span><br><span class="line">        //Bean初始化的前置处理器  </span><br><span class="line">    Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException;  </span><br><span class="line">  </span><br><span class="line">    //Bean初始化的后置处理器  </span><br><span class="line">    Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException;  </span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
 </ol>
@@ -399,6 +395,16 @@
     
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spring/" rel="tag"># Spring</a>
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+        </div>
       
 
       
@@ -506,6 +512,15 @@
               </div>
             
 
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
             
 
           </nav>

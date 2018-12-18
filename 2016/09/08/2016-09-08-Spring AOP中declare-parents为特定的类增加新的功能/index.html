@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="Spring,Java,Linux,">
 
 
 
@@ -79,17 +79,18 @@
 
 
 
-<meta name="description" content="tags: - Spring - Java - Linux  如果有这样一个需求，为一个已知的API添加一个新的功能。 由于是已知的API，我们不能修改其类，只能通过外部包装。但是如果通过之前的AOP前置或后置通知，又不太合理，最简单的办法就是实现某个我们自定义的接口，这个接口包含了想要添加的方法。 但是JAVA不是一门动态的语言，无法再编译后动态添加新的功能，这个时候就可以使用 aop:decl">
+<meta name="description" content="如果有这样一个需求，为一个已知的API添加一个新的功能。 由于是已知的API，我们不能修改其类，只能通过外部包装。但是如果通过之前的AOP前置或后置通知，又不太合理，最简单的办法就是实现某个我们自定义的接口，这个接口包含了想要添加的方法。 但是JAVA不是一门动态的语言，无法再编译后动态添加新的功能，这个时候就可以使用 aop:declare-parents 来做了. 如果是可以改写的类，直接实现">
+<meta name="keywords" content="Spring,Java,Linux">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spring AOP中declare-parents为特定的类增加新的功能">
 <meta property="og:url" content="http://denglinjie.com/2016/09/08/2016-09-08-Spring AOP中declare-parents为特定的类增加新的功能/index.html">
 <meta property="og:site_name" content="jasonjie">
-<meta property="og:description" content="tags: - Spring - Java - Linux  如果有这样一个需求，为一个已知的API添加一个新的功能。 由于是已知的API，我们不能修改其类，只能通过外部包装。但是如果通过之前的AOP前置或后置通知，又不太合理，最简单的办法就是实现某个我们自定义的接口，这个接口包含了想要添加的方法。 但是JAVA不是一门动态的语言，无法再编译后动态添加新的功能，这个时候就可以使用 aop:decl">
+<meta property="og:description" content="如果有这样一个需求，为一个已知的API添加一个新的功能。 由于是已知的API，我们不能修改其类，只能通过外部包装。但是如果通过之前的AOP前置或后置通知，又不太合理，最简单的办法就是实现某个我们自定义的接口，这个接口包含了想要添加的方法。 但是JAVA不是一门动态的语言，无法再编译后动态添加新的功能，这个时候就可以使用 aop:declare-parents 来做了. 如果是可以改写的类，直接实现">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-12-18T05:03:07.815Z">
+<meta property="og:updated_time" content="2018-12-18T05:16:23.883Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spring AOP中declare-parents为特定的类增加新的功能">
-<meta name="twitter:description" content="tags: - Spring - Java - Linux  如果有这样一个需求，为一个已知的API添加一个新的功能。 由于是已知的API，我们不能修改其类，只能通过外部包装。但是如果通过之前的AOP前置或后置通知，又不太合理，最简单的办法就是实现某个我们自定义的接口，这个接口包含了想要添加的方法。 但是JAVA不是一门动态的语言，无法再编译后动态添加新的功能，这个时候就可以使用 aop:decl">
+<meta name="twitter:description" content="如果有这样一个需求，为一个已知的API添加一个新的功能。 由于是已知的API，我们不能修改其类，只能通过外部包装。但是如果通过之前的AOP前置或后置通知，又不太合理，最简单的办法就是实现某个我们自定义的接口，这个接口包含了想要添加的方法。 但是JAVA不是一门动态的语言，无法再编译后动态添加新的功能，这个时候就可以使用 aop:declare-parents 来做了. 如果是可以改写的类，直接实现">
 
 
 
@@ -351,12 +352,7 @@
       
 
       
-        <p>tags:</p>
-<pre><code>- Spring
-- Java
-- Linux
-</code></pre><hr>
-<p>如果有这样一个需求，为一个已知的API添加一个新的功能。</p>
+        <p>如果有这样一个需求，为一个已知的API添加一个新的功能。</p>
 <p>由于是已知的API，我们不能修改其类，只能通过外部包装。但是如果通过之前的AOP前置或后置通知，又不太合理，最简单的办法就是实现某个我们自定义的接口，这个接口包含了想要添加的方法。</p>
 <p>但是JAVA不是一门动态的语言，无法再编译后动态添加新的功能，这个时候就可以使用 aop:declare-parents 来做了.</p>
 <p>如果是可以改写的类，直接实现自定义的接口就行了，下面看看AOP是如何做的！</p>
@@ -380,6 +376,16 @@
     
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spring/" rel="tag"># Spring</a>
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+        </div>
       
 
       
@@ -483,6 +489,15 @@
               </div>
             
 
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
             
 
           </nav>
