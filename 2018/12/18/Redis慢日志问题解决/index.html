@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="现象：      无线词条页访问失败问题分析： 1、首先，查看日志 日志中非常显眼的是，从Redis读取词条的pv耗时很长，高达20多秒， 看样子是访问Redis速度很慢导致 2、查看Redis的慢日志1&amp;gt; SLOWLOG GET 可以得到如下结果：1234567891011121314151617181920212223242525) 1) (integer) 160">
+<meta name="description" content="现象：      无线词条页访问失败问题分析： 1、首先，查看日志 日志中非常显眼的是，从Redis读取词条的pv耗时很长，高达20多秒， 看样子是访问Redis速度很慢导致2、查看Redis的慢日志1&amp;gt; SLOWLOG GET 可以得到如下结果：1234567891011121314151617181920212223242525) 1) (integer) 160">
 <meta name="keywords" content="Redis">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Redis慢日志问题解决">
 <meta property="og:url" content="http://www.denglinjie.com/2018/12/18/Redis慢日志问题解决/index.html">
 <meta property="og:site_name" content="jasonjie">
-<meta property="og:description" content="现象：      无线词条页访问失败问题分析： 1、首先，查看日志 日志中非常显眼的是，从Redis读取词条的pv耗时很长，高达20多秒， 看样子是访问Redis速度很慢导致 2、查看Redis的慢日志1&amp;gt; SLOWLOG GET 可以得到如下结果：1234567891011121314151617181920212223242525) 1) (integer) 160">
+<meta property="og:description" content="现象：      无线词条页访问失败问题分析： 1、首先，查看日志 日志中非常显眼的是，从Redis读取词条的pv耗时很长，高达20多秒， 看样子是访问Redis速度很慢导致2、查看Redis的慢日志1&amp;gt; SLOWLOG GET 可以得到如下结果：1234567891011121314151617181920212223242525) 1) (integer) 160">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-12-18T09:23:46.545Z">
+<meta property="og:updated_time" content="2018-12-18T09:39:54.122Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Redis慢日志问题解决">
-<meta name="twitter:description" content="现象：      无线词条页访问失败问题分析： 1、首先，查看日志 日志中非常显眼的是，从Redis读取词条的pv耗时很长，高达20多秒， 看样子是访问Redis速度很慢导致 2、查看Redis的慢日志1&amp;gt; SLOWLOG GET 可以得到如下结果：1234567891011121314151617181920212223242525) 1) (integer) 160">
+<meta name="twitter:description" content="现象：      无线词条页访问失败问题分析： 1、首先，查看日志 日志中非常显眼的是，从Redis读取词条的pv耗时很长，高达20多秒， 看样子是访问Redis速度很慢导致2、查看Redis的慢日志1&amp;gt; SLOWLOG GET 可以得到如下结果：1234567891011121314151617181920212223242525) 1) (integer) 160">
 
 
 
@@ -354,10 +354,9 @@
       
         <p>现象：<br>      无线词条页访问失败<br>问题分析：</p>
 <p>1、首先，查看日志</p>
-<p>日志中非常显眼的是，从Redis读取词条的pv耗时很长，高达20多秒， 看样子是访问Redis速度很慢导致</p>
-<p>2、查看Redis的慢日志<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; SLOWLOG GET</span><br></pre></td></tr></table></figure></p>
+<p>日志中非常显眼的是，从Redis读取词条的pv耗时很长，高达20多秒， 看样子是访问Redis速度很慢导致<br>2、查看Redis的慢日志<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; SLOWLOG GET</span><br></pre></td></tr></table></figure></p>
 <p>可以得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">25) 1) (integer) 160            #日志的唯一标识符（uid）</span><br><span class="line">     2) (integer) 1543060013    #命令执行的时间点，UNIX时间戳</span><br><span class="line">     3) (integer) 22679074      #命令执行的时长，单位是微妙</span><br><span class="line">     4) 1) &quot;ZREVRANGE&quot;          #命令及其参数信息</span><br><span class="line">        2) &quot;baike_lemma_pv&quot;</span><br><span class="line">        3) &quot;0&quot;</span><br><span class="line">        4) &quot;20000000&quot;</span><br><span class="line">        5) &quot;withscores&quot;</span><br><span class="line">26) 1) (integer) 159</span><br><span class="line">     2) (integer) 1542973618</span><br><span class="line">     3) (integer) 22829521</span><br><span class="line">     4) 1) &quot;ZREVRANGE&quot;</span><br><span class="line">        2) &quot;baike_lemma_pv&quot;</span><br><span class="line">        3) &quot;0&quot;</span><br><span class="line">        4) &quot;20000000&quot;</span><br><span class="line">        5) &quot;withscores&quot;</span><br><span class="line">27) 1) (integer) 158</span><br><span class="line">     2) (integer) 1542888649</span><br><span class="line">     3) (integer) 22396426</span><br><span class="line">     4) 1) &quot;ZREVRANGE&quot;</span><br><span class="line">        2) &quot;baike_lemma_pv&quot;</span><br><span class="line">        3) &quot;0&quot;</span><br><span class="line">        4) &quot;20000000&quot;</span><br><span class="line">        5) &quot;withscores&quot;</span><br></pre></td></tr></table></figure></p>
-<p>可以看到有些请求耗时特别长，高达20s，这个时间似乎和日志中的时间比较吻合</p>
+<p>可以看到有些请求耗时特别长，高达20s，这个时间似乎和日志中的时间比较吻合<br><a id="more"></a></p>
 <p>3、再看下当前连接上Redis的连接数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; info</span><br></pre></td></tr></table></figure></p>
 <p>得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># Clients</span><br><span class="line">connected_clients:626</span><br></pre></td></tr></table></figure></p>
 <p>目前有626个客户端和Redis服务端建立了连接，并排队等待被Redis的单线程处理， 这个数量说多也不多，说少也不少</p>
