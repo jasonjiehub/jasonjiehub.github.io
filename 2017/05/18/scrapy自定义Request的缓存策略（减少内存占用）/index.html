@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Python,scrapy,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="scrapy-redis大概的架构： 从redis中拉url，构造Request对象，写入SCHEDULER_QUEUE_CLASS定义的队列中，调度器从队列中拉取Request进行抓取 想自定义Request的初衷主要是为了减少内存的占用，当然虽然我们的内存消耗的也不是那么多，也就几个G scrapy自带的几个队列有这么几个： 123* scrapy_redis.queue.SpiderQueu">
+<meta name="keywords" content="Python,scrapy">
+<meta property="og:type" content="article">
+<meta property="og:title" content="scrapy自定义Request的缓存策略（减少内存占用）">
+<meta property="og:url" content="http://www.denglinjie.com/2017/05/18/scrapy自定义Request的缓存策略（减少内存占用）/index.html">
+<meta property="og:site_name" content="jasonjie">
+<meta property="og:description" content="scrapy-redis大概的架构： 从redis中拉url，构造Request对象，写入SCHEDULER_QUEUE_CLASS定义的队列中，调度器从队列中拉取Request进行抓取 想自定义Request的初衷主要是为了减少内存的占用，当然虽然我们的内存消耗的也不是那么多，也就几个G scrapy自带的几个队列有这么几个： 123* scrapy_redis.queue.SpiderQueu">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-12-18T10:57:10.561Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="scrapy自定义Request的缓存策略（减少内存占用）">
+<meta name="twitter:description" content="scrapy-redis大概的架构： 从redis中拉url，构造Request对象，写入SCHEDULER_QUEUE_CLASS定义的队列中，调度器从队列中拉取Request进行抓取 想自定义Request的初衷主要是为了减少内存的占用，当然虽然我们的内存消耗的也不是那么多，也就几个G scrapy自带的几个队列有这么几个： 123* scrapy_redis.queue.SpiderQueu">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.denglinjie.com/2017/05/18/scrapy自定义Request的缓存策略（减少内存占用）/">
+
+
+
+
+
+  <title>scrapy自定义Request的缓存策略（减少内存占用） | jasonjie</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">jasonjie</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2017/05/18/scrapy自定义Request的缓存策略（减少内存占用）/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="jasonjie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jasonjie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">scrapy自定义Request的缓存策略（减少内存占用）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-18T18:54:34+08:00">
+                2017-05-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>scrapy-redis大概的架构：</p>
+<p>从redis中拉url，构造Request对象，写入SCHEDULER_QUEUE_CLASS定义的队列中，调度器从队列中拉取Request进行抓取</p>
+<p>想自定义Request的初衷主要是为了减少内存的占用，当然虽然我们的内存消耗的也不是那么多，也就几个G</p>
+<p>scrapy自带的几个队列有这么几个：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">* scrapy_redis.queue.SpiderQueue：队列。先入先出队列，先放入Redis的请求优先爬取；</span><br><span class="line">* scrapy_redis.queue.SpiderStack：栈。后放入Redis的请求会优先爬取；</span><br><span class="line">* scrapy_redis.queue.SpiderPriorityQueue：优先级队列。根据优先级算法计算哪个先爬哪个后爬，比较麻烦</span><br></pre></td></tr></table></figure>
+<p>简单看下PriorityQueue的源码：<br><a id="more"></a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">class PriorityQueue(Base)：</span><br><span class="line"> </span><br><span class="line">    def __len__(self):</span><br><span class="line">        return self.server.zcard(self.key)</span><br><span class="line"> </span><br><span class="line">    def push(self, request):</span><br><span class="line">        data = self._encode_request(request)</span><br><span class="line">        score = -request.priority</span><br><span class="line">        self.server.execute_command(&apos;ZADD&apos;, self.key, score, data)</span><br><span class="line"> </span><br><span class="line">    def pop(self, timeout=0):</span><br><span class="line">        pipe = self.server.pipeline()</span><br><span class="line">        pipe.multi()</span><br><span class="line">        pipe.zrange(self.key, 0, 0).zremrangebyrank(self.key, 0, 0)</span><br><span class="line">        results, count = pipe.execute()</span><br><span class="line">        if results:</span><br><span class="line">            return self._decode_request(results[0])</span><br></pre></td></tr></table></figure></p>
+<p>其中的_encode_request就是对request对象进行序列化，而_decode_request是对request对象进行反序列化</p>
+<p>跟踪下去，其实可以发现，它把整个request对象都进行了序列化存储，然而我们其实只需要url和callback就行， 另外我们其实不需要优先级队列，我们的url也没有优先级顺序，可以改用list</p>
+<p>所以我重写了一个队列：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#-*- coding:utf8 -*-</span><br><span class="line"> </span><br><span class="line">from scrapy_redis.queue import Base</span><br><span class="line">from scrapy.utils.reqser import request_to_dict, request_from_dict, _find_method</span><br><span class="line">from scrapy.http import Request</span><br><span class="line">import sys</span><br><span class="line"> </span><br><span class="line">class SimpleSpiderQueue(Base):</span><br><span class="line"> </span><br><span class="line">    def __len__(self):</span><br><span class="line">        return self.server.llen(self.key)</span><br><span class="line"> </span><br><span class="line">    def push(self, request):</span><br><span class="line">        url = request.url</span><br><span class="line">        cb = request.callback</span><br><span class="line">        if callable(cb):</span><br><span class="line">            cb = _find_method(self.spider, cb)</span><br><span class="line">            data = &apos;%s-*-%s&apos; % (url, cb)</span><br><span class="line">            self.server.lpush(self.key, data)</span><br><span class="line">        else:</span><br><span class="line">            self.server.lpush(self.key, url)</span><br><span class="line"> </span><br><span class="line">    def pop(self, timeout=0):</span><br><span class="line">        if timeout &gt; 0:</span><br><span class="line">            data = self.server.brpop(self.key, timeout=timeout)</span><br><span class="line">            if isinstance(data, tuple):</span><br><span class="line">                data = data[1]</span><br><span class="line">        else:</span><br><span class="line">            data = self.server.rpop(self.key)</span><br><span class="line"> </span><br><span class="line">        if data:</span><br><span class="line">            p = data.split(&apos;-*-&apos;)</span><br><span class="line">            try:</span><br><span class="line">                if len(p) == 2:</span><br><span class="line">                    nurl = p[0]</span><br><span class="line">                    cb = p[1]</span><br><span class="line">                    cb = getattr(self.spider, str(cb))</span><br><span class="line">                    return Request(url=nurl, callback=cb)</span><br><span class="line">                else:</span><br><span class="line">                    nurl = p[0]</span><br><span class="line">                    return Request(url=nurl)</span><br><span class="line">            except AttributeError as e:</span><br><span class="line">                raise ValueError(&quot;Method %r not found in: %s&quot; % (cb, self.spider))</span><br></pre></td></tr></table></figure></p>
+<p>代码中考虑了有callback和没有callback两种情况</p>
+<p>有callback，则缓存的数据为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">url-*-callback</span><br></pre></td></tr></table></figure></p>
+<p>没有callback时，只缓存url<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">url</span><br></pre></td></tr></table></figure></p>
+<p>此外，我们需要在settings.py中配置上我们自定义的队列<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SCHEDULER_QUEUE_CLASS = &apos;CrawlBaiduMobile.simple_queue.SimpleSpiderQueue&apos;</span><br><span class="line">SCHEDULER_QUEUE_KEY = &apos;%(spider)s:requests&apos;</span><br></pre></td></tr></table></figure></p>
+<p>用了这种缓存策略后，整个内存占用减少了一半以上</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+            <a href="/tags/scrapy/" rel="tag"># scrapy</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/18/tornado异步请求响应速度的实例测试/" rel="next" title="tornado异步请求响应速度的实例测试">
+                <i class="fa fa-chevron-left"></i> tornado异步请求响应速度的实例测试
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/24/scrapy中自定义过滤规则以及start-urls不进过滤器的问题/" rel="prev" title="scrapy中自定义过滤规则以及start_urls不进过滤器的问题">
+                scrapy中自定义过滤规则以及start_urls不进过滤器的问题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">jasonjie</p>
+              <p class="site-description motion-element" itemprop="description">生活不只眼前的苟且，还有诗和远方的田野</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">23</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jasonjie</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
