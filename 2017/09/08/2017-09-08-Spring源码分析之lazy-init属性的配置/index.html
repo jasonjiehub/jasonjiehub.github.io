@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Spring,Java,Linux,">
+  <meta name="keywords" content="Hexo, NexT">
 
 
 
@@ -79,18 +79,17 @@
 
 
 
-<meta name="description" content="AbstractApplicationContext类默认在容器初始化的过程中就会执行依赖注入，即等价于配置lazy-init属性为false，bean的配置如下：123456789&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;&amp;lt;beans xmlns=&amp;quot;http://www.springframew">
-<meta name="keywords" content="Spring,Java,Linux">
+<meta name="description" content="tags: - Spring - Java - Linux  AbstractApplicationContext类默认在容器初始化的过程中就会执行依赖注入，即等价于配置lazy-init属性为false，bean的配置如下：123456789&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;&amp;lt;beans xmln">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spring源码分析之lazy-init属性的配置">
 <meta property="og:url" content="http://denglinjie.com/2017/09/08/2017-09-08-Spring源码分析之lazy-init属性的配置/index.html">
 <meta property="og:site_name" content="jasonjie">
-<meta property="og:description" content="AbstractApplicationContext类默认在容器初始化的过程中就会执行依赖注入，即等价于配置lazy-init属性为false，bean的配置如下：123456789&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;&amp;lt;beans xmlns=&amp;quot;http://www.springframew">
+<meta property="og:description" content="tags: - Spring - Java - Linux  AbstractApplicationContext类默认在容器初始化的过程中就会执行依赖注入，即等价于配置lazy-init属性为false，bean的配置如下：123456789&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;&amp;lt;beans xmln">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-12-18T02:52:45.199Z">
+<meta property="og:updated_time" content="2018-12-18T04:58:45.748Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spring源码分析之lazy-init属性的配置">
-<meta name="twitter:description" content="AbstractApplicationContext类默认在容器初始化的过程中就会执行依赖注入，即等价于配置lazy-init属性为false，bean的配置如下：123456789&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;&amp;lt;beans xmlns=&amp;quot;http://www.springframew">
+<meta name="twitter:description" content="tags: - Spring - Java - Linux  AbstractApplicationContext类默认在容器初始化的过程中就会执行依赖注入，即等价于配置lazy-init属性为false，bean的配置如下：123456789&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;&amp;lt;beans xmln">
 
 
 
@@ -303,6 +302,28 @@
           </span>
 
           
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java开发/" itemprop="url" rel="index">
+                    <span itemprop="name">Java开发</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -330,7 +351,12 @@
       
 
       
-        <p>AbstractApplicationContext类默认在容器初始化的过程中就会执行依赖注入，即等价于配置lazy-init属性为false，bean的配置如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;</span><br><span class="line">       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">       xmlns:context=&quot;http://www.springframework.org/schema/context&quot;</span><br><span class="line">       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans</span><br><span class="line">        http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;bean id=&quot;studentService&quot; class=&quot;com.verify.constant.StudentService&quot; init-method=&quot;initMethod&quot; lazy-init=&quot;false&quot;/&gt;</span><br><span class="line">&lt;/beans&gt;</span><br></pre></td></tr></table></figure></p>
+        <p>tags:</p>
+<pre><code>- Spring
+- Java
+- Linux
+</code></pre><hr>
+<p>AbstractApplicationContext类默认在容器初始化的过程中就会执行依赖注入，即等价于配置lazy-init属性为false，bean的配置如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;</span><br><span class="line">       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">       xmlns:context=&quot;http://www.springframework.org/schema/context&quot;</span><br><span class="line">       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans</span><br><span class="line">        http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;bean id=&quot;studentService&quot; class=&quot;com.verify.constant.StudentService&quot; init-method=&quot;initMethod&quot; lazy-init=&quot;false&quot;/&gt;</span><br><span class="line">&lt;/beans&gt;</span><br></pre></td></tr></table></figure></p>
 <p>容器的初始化是在AbstractApplicationContext的refresh()方法中执行的，如下代码对lazy-init进行了处理：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">finishBeanFactoryInitialization(beanFactory);</span><br></pre></td></tr></table></figure></p>
 <p>跟踪下去可以找到真正的读取lazy-init属性进行懒加载相关处理的地方<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">	public void preInstantiateSingletons() throws BeansException &#123;</span><br><span class="line">		if (this.logger.isDebugEnabled()) &#123;</span><br><span class="line">			this.logger.debug(&quot;Pre-instantiating singletons in &quot; + this);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		// Iterate over a copy to allow for init methods which in turn register new bean definitions.</span><br><span class="line">		// While this may not be part of the regular factory bootstrap, it does otherwise work fine.</span><br><span class="line">		List&lt;String&gt; beanNames = new ArrayList&lt;String&gt;(this.beanDefinitionNames);</span><br><span class="line"></span><br><span class="line">		// Trigger initialization of all non-lazy singleton beans...</span><br><span class="line">		for (String beanName : beanNames) &#123;</span><br><span class="line">			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);</span><br><span class="line">			if (!bd.isAbstract() &amp;&amp; bd.isSingleton() &amp;&amp; !bd.isLazyInit()) &#123;</span><br><span class="line">				if (isFactoryBean(beanName)) &#123;</span><br><span class="line">					final FactoryBean&lt;?&gt; factory = (FactoryBean&lt;?&gt;) getBean(FACTORY_BEAN_PREFIX + beanName);</span><br><span class="line">					boolean isEagerInit;</span><br><span class="line">					if (System.getSecurityManager() != null &amp;&amp; factory instanceof SmartFactoryBean) &#123;</span><br><span class="line">						isEagerInit = AccessController.doPrivileged(new PrivilegedAction&lt;Boolean&gt;() &#123;</span><br><span class="line">							@Override</span><br><span class="line">							public Boolean run() &#123;</span><br><span class="line">								return ((SmartFactoryBean&lt;?&gt;) factory).isEagerInit();</span><br><span class="line">							&#125;</span><br><span class="line">						&#125;, getAccessControlContext());</span><br><span class="line">					&#125;</span><br><span class="line">					else &#123;</span><br><span class="line">						isEagerInit = (factory instanceof SmartFactoryBean &amp;&amp;</span><br><span class="line">								((SmartFactoryBean&lt;?&gt;) factory).isEagerInit());</span><br><span class="line">					&#125;</span><br><span class="line">					if (isEagerInit) &#123;</span><br><span class="line">						getBean(beanName);</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">				else &#123;</span><br><span class="line">					getBean(beanName);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		// Trigger post-initialization callback for all applicable beans...</span><br><span class="line">		for (String beanName : beanNames) &#123;</span><br><span class="line">			Object singletonInstance = getSingleton(beanName);</span><br><span class="line">			if (singletonInstance instanceof SmartInitializingSingleton) &#123;</span><br><span class="line">				final SmartInitializingSingleton smartSingleton = (SmartInitializingSingleton) singletonInstance;</span><br><span class="line">				if (System.getSecurityManager() != null) &#123;</span><br><span class="line">					AccessController.doPrivileged(new PrivilegedAction&lt;Object&gt;() &#123;</span><br><span class="line">						@Override</span><br><span class="line">						public Object run() &#123;</span><br><span class="line">							smartSingleton.afterSingletonsInstantiated();</span><br><span class="line">							return null;</span><br><span class="line">						&#125;</span><br><span class="line">					&#125;, getAccessControlContext());</span><br><span class="line">				&#125;</span><br><span class="line">				else &#123;</span><br><span class="line">					smartSingleton.afterSingletonsInstantiated();</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure></p>
 <p>可以看到代码中对所有注册的bean，即this.beanDefinitionNames，对于每个bean都会做如下判断，如果成立就会执行依赖注入：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">if (!bd.isAbstract() &amp;&amp; bd.isSingleton() &amp;&amp; !bd.isLazyInit())</span><br></pre></td></tr></table></figure></p>
@@ -349,16 +375,6 @@
     
 
     <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/tags/Spring/" rel="tag"># Spring</a>
-          
-            <a href="/tags/Java/" rel="tag"># Java</a>
-          
-            <a href="/tags/Linux/" rel="tag"># Linux</a>
-          
-        </div>
       
 
       
@@ -460,21 +476,12 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-count">2</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
             
 
-            
-              
-              
-              <div class="site-state-item site-state-tags">
-                <a href="/tags/index.html">
-                  <span class="site-state-item-count">4</span>
-                  <span class="site-state-item-name">标签</span>
-                </a>
-              </div>
             
 
           </nav>
