@@ -262,6 +262,298 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2016/09/12/2016-09-12-Spring IOC学习心得之注册bean的依赖关系/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="jasonjie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jasonjie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/09/12/2016-09-12-Spring IOC学习心得之注册bean的依赖关系/" itemprop="url">Spring IOC学习心得之注册bean的依赖关系</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-09-12T00:00:00+08:00">
+                2016-09-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java开发/" itemprop="url" rel="index">
+                    <span itemprop="name">Java开发</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>registerDependentBean方法的解析（注册bean的依赖关系）<br>源码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">public void registerDependentBean(String beanName, String dependentBeanName) &#123;  </span><br><span class="line">        // A quick check for an existing entry upfront, avoiding synchronization...  </span><br><span class="line">        String canonicalName = canonicalName(beanName);  </span><br><span class="line">        /*  </span><br><span class="line">        dependentBeanMap中存储的是目前已经注册的依赖这个bean的所有bean,这里从这个集合中获取目前所有已经注册的依赖beanName的bean集合,  </span><br><span class="line">        然后看这个集合中是否包含dependentBeanName,即是否已经注册,如果包含则表示已经注册,则直接返回,否则,将bean依赖关系添加到两个map缓存即完成注册  </span><br><span class="line">            */  </span><br><span class="line">        Set&lt;String&gt; dependentBeans = this.dependentBeanMap.get(canonicalName);  </span><br><span class="line">        if (dependentBeans != null &amp;&amp; dependentBeans.contains(dependentBeanName)) &#123;  </span><br><span class="line">            return;  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        // No entry yet -&gt; fully synchronized manipulation of the dependentBeans Set  </span><br><span class="line">        synchronized (this.dependentBeanMap) &#123;  </span><br><span class="line">            dependentBeans = this.dependentBeanMap.get(canonicalName);  </span><br><span class="line">            if (dependentBeans == null) &#123;  </span><br><span class="line">                dependentBeans = new LinkedHashSet&lt;&gt;(8);  </span><br><span class="line">                this.dependentBeanMap.put(canonicalName, dependentBeans);  </span><br><span class="line">            &#125;  </span><br><span class="line">            dependentBeans.add(dependentBeanName);  </span><br><span class="line">        &#125;  </span><br><span class="line">        synchronized (this.dependenciesForBeanMap) &#123;  </span><br><span class="line">            Set&lt;String&gt; dependenciesForBean = this.dependenciesForBeanMap.get(dependentBeanName);  </span><br><span class="line">            if (dependenciesForBean == null) &#123;  </span><br><span class="line">                dependenciesForBean = new LinkedHashSet&lt;&gt;(8);  </span><br><span class="line">                this.dependenciesForBeanMap.put(dependentBeanName, dependenciesForBean);  </span><br><span class="line">            &#125;  </span><br><span class="line">            dependenciesForBean.add(canonicalName);  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/09/12/2016-09-12-Spring IOC学习心得之注册bean的依赖关系/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2016/09/11/2016-09-11-Spring IOC学习心得之Bean对IOC容器的感知/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="jasonjie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jasonjie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/09/11/2016-09-11-Spring IOC学习心得之Bean对IOC容器的感知/" itemprop="url">Spring IOC学习心得之Bean对IOC容器的感知</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-09-11T00:00:00+08:00">
+                2016-09-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java开发/" itemprop="url" rel="index">
+                    <span itemprop="name">Java开发</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>容器管理的Bean一般不需要了解容器的状态和直接使用Bean，但是在某些情况下，是需要在Bean中直接对IOC容器进行操作的，这时候，就需要在Bean中设定对容器的感知。Spring IOC也提供了该功能，它是通过特定的aware接口来完成的。aware接口有如下这些：<br>BeanNameAware：可以在Bean中得到它在IOC容器中的Bean的实例名称<br>BeanFactoryAware：可以在Bean中得到Bean所在的IOC容器，从而直接在Bean中使用IOC容器的服务<br>ApplicationContextAware：可以在Bean中得到Bean所在的应用上下文，从而直接在Bean中使用应用上下文的服务<br>MessageSourceAware：在Bean中可以得到消息源<br>ApplicationEventPublisherAware：在Bean中可以得到应用上下文的事件发布器，从而可以在Bean中发布应用上下文的事件<br>ResourceLoaderAware：在Bean中可以得到resourceloader，从而在Bean中使用ResourceLoader加载外部对应的Resource资源<br>要在自定义的Bean中获取上述资源，只需要让Bean实现对应的接口，并覆写set方法，如下：<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/09/11/2016-09-11-Spring IOC学习心得之Bean对IOC容器的感知/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </p></div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2016/09/11/2016-09-11-Spring IOC学习心得之IOC容器的初始化过程/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -742,7 +1034,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">23</span>
+                  <span class="site-state-item-count">25</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -753,7 +1045,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">5</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -764,7 +1056,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

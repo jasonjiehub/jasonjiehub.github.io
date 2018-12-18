@@ -1,4 +1,6 @@
 http://www.denglinjie.com/2018/12/18/Redis慢日志问题解决/
+http://www.denglinjie.com/2018/01/03/tf-layers-conv1d函数解析（一维卷积）/
+http://www.denglinjie.com/2017/09/16/一次Redis任务队列积压的问题分析与解决/
 http://www.denglinjie.com/2017/09/08/2017-09-12-我是如何解决jobtracker.info could only be replicated to 0 nodes, instead of 1这个问题的/
 http://www.denglinjie.com/2017/06/15/两台机器实现QPS3000的服务优化/
 http://www.denglinjie.com/2017/06/13/压测中提高并发数后服务端处理时间增长的原因分析/
