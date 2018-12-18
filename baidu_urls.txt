@@ -25,6 +25,9 @@ http://www.denglinjie.com/2017/05/18/scrapy自定义Request的缓存策略（减
 http://www.denglinjie.com/2017/05/18/tornado异步请求响应速度的实例测试/
 http://www.denglinjie.com/2017/05/16/scrapy自定义网页中图片的下载策略/
 http://www.denglinjie.com/2017/05/14/写磁盘太慢导致服务超时问题分析/
+http://www.denglinjie.com/2017/02/18/基于phash和汉明距离找出相似图片/
+http://www.denglinjie.com/2016/12/04/Java程序莫名其妙卡死的一次经历/
+http://www.denglinjie.com/2016/11/18/又一次Java线程卡死的调试经历/
 http://www.denglinjie.com/2016/09/20/2016-09-20-Spring源码分析之ProxyFactoryBean方式实现Aop功能的分析/
 http://www.denglinjie.com/2016/09/20/2016-09-20-Spring源码分析之SpringMVC的DispatcherServlet是如何处理Http请求的/
 http://www.denglinjie.com/2016/09/18/Java开发Maven插件/
