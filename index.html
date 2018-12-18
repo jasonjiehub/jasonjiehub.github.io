@@ -262,6 +262,184 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2018/12/18/写磁盘太慢导致服务超时问题分析/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="jasonjie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jasonjie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/18/写磁盘太慢导致服务超时问题分析/" itemprop="url">写磁盘太慢导致服务超时问题分析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-18T17:26:09+08:00">
+                2018-12-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>服务逻辑：</p>
+<pre><code>接收客户端的请求参数，写文件到本地磁盘
+</code></pre><p>问题发现：</p>
+<pre><code>客户端报超时， 每天日志理论上是有几万条的，但是近几天只收到了几条
+</code></pre><p>问题分析：</p>
+<pre><code>其实最开始的时候，以为是服务端处理不过来导致的，因为最开始服务端只有两个服务进程，后来增加了服务进程数，但是超时问题仍然没有得到解决
+
+也怪自己没有做压力测试，如果做了压测，那么服务处理不过来的问题其实一开始就应该被排除的
+</code></pre><p>现象： </p>
+<pre><code>机器的反应速度特别慢， 基本的mkdir，cp命令的反应速度都特别慢， 看来跟这个应该是有关系的
+</code></pre><p>问题分析的步骤：</p>
+<p>1、查看CPU的使用情况</p>
+<p>top命令查看了下负载情况：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">top - 11:34:30 up 472 days, 19:16, 14 users,  load average: 22.10, 21.33, 20.14</span><br><span class="line">Tasks: 1021 total,   9 running, 1012 sleeping,   0 stopped,   0 zombie</span><br><span class="line">Cpu(s): 22.9%us,  4.0%sy,  0.0%ni, 72.6%id,  0.3%wa,  0.0%hi,  0.2%si,  0.0%st</span><br><span class="line">Mem:  132043616k total, 110024480k used, 6019136k free,     9204k buffers</span><br><span class="line">Swap:        0k total,        0k used,        0k free, 24117220k cached</span><br></pre></td></tr></table></figure></p>
+<p>发现load average超过了20， 可用内存不足10G， 负载偏高， 内存勉强够用</p>
+<p>2、查看磁盘使用情况：</p>
+<p>执行如下命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$df -lh</span><br></pre></td></tr></table></figure></p>
+<p>得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Filesystem            Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/mapper/vgroot-lvroot</span><br><span class="line">                      9.8G  1.7G  7.6G  19% /</span><br><span class="line">tmpfs                  63G  296K   63G   1% /dev/shm</span><br><span class="line">/dev/sda1             194M   63M  122M  35% /boot</span><br><span class="line">/dev/mapper/vgroot-lvusr</span><br><span class="line">                      9.8G  2.5G  6.8G  27% /usr</span><br><span class="line">/dev/mapper/vgroot-lvvar</span><br><span class="line">                       15G   12G  2.7G  82% /var</span><br><span class="line">/dev/mapper/vgroot-lvopt</span><br><span class="line">                       16G  480M   16G   3% /opt</span><br><span class="line">/dev/mapper/vgroot-lvted</span><br><span class="line">                      228G   33M  228G   1% /search/ted</span><br><span class="line">/dev/sdb1             447G  331G  116G  75% /search/ssd</span><br><span class="line">/dev/sdc1              11T  4.0T  7.0T  37% /search/odin</span><br><span class="line">/dev/sdd1              11T  3.3T  7.8T  30% /search/sdb</span><br><span class="line">/dev/sde1              11T  3.2T  7.8T  29% /search/sdc</span><br></pre></td></tr></table></figure></p>
+<p>因为我们的服务是部署在”/search/odin”目录下， 服务写文件也是在这块磁盘上，可以看到这块磁盘”/search/sdc1”的使用率并不高，还有很大的可用空间， 所以应该不是因为磁盘不够导致的</p>
+<p>3、查看磁盘io的使用情况：</p>
+<p>执行如下命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iostat -d -x 2 100</span><br></pre></td></tr></table></figure></p>
+<p>可以看到如下结果<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Device:         rrqm/s   wrqm/s     r/s     w/s   rsec/s   wsec/s avgrq-sz avgqu-sz   await  svctm  %util</span><br><span class="line">sda               0.00    22.00    1.50   39.00    12.00   524.00    13.23     0.01    0.28   0.27   1.10</span><br><span class="line">sdc               0.00     0.00   72.00   38.50  1148.00  6508.00    69.29     0.15    1.38   1.34  100.00</span><br><span class="line">sde               0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00   0.00   0.00</span><br><span class="line">sdd               0.00     0.00    0.00   10.00     0.00   100.00    10.00     0.00    0.00   0.00   0.00</span><br><span class="line">sdb               0.00     0.00  145.50  456.00 28948.00  6236.00    58.49     0.17    0.28   0.20  12.00</span><br><span class="line">dm-0              0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00   0.00   0.00</span><br><span class="line">dm-1              0.00     0.00    1.50   60.00    12.00   480.00     8.00     0.01    0.21   0.18   1.10</span><br><span class="line">dm-2              0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00   0.00   0.00</span><br><span class="line">dm-3              0.00     0.00    0.00    1.00     0.00    44.00    44.00     0.00    0.00   0.00   0.00</span><br><span class="line">dm-4              0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00   0.00   0.00</span><br><span class="line">dm-5              0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00   0.00   0.00</span><br><span class="line">dm-6              0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00   0.00   0.00</span><br><span class="line">dm-7              0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00   0.00   0.00</span><br><span class="line">dm-9              0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00   0.00   0.00</span><br><span class="line">dm-8              0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00   0.00   0.00</span><br></pre></td></tr></table></figure></p>
+<p>可以看到sdc这块盘的使用率非常高，达到了100%</p>
+<p>第二步中我们知道，我们的服务是要往“/search/sdc1”这块盘中写文件的， 看来就是sdc这块盘的资源不足导致的写文件速度慢，从而拉长了整个服务的时间， 从而导致了客户端的超时。</p>
+<p>4、究竟是哪个进程消耗了这么多的io资源</p>
+<p>执行如下命令查看：这个命令需要root权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$iotop</span><br></pre></td></tr></table></figure>
+<p>可以看到的是和写es相关的服务占用了大量的磁盘资源</p>
+<p>这个es服务每秒有大量的写请求，而它占用的磁盘io这么高，是因为内存不够，导致写请求直接写到磁盘了</p>
+<p>5、能不能释放点内存来缓解es写磁盘的压力？</p>
+<p>top命令可以看到有一个进程占用了30多个G的内存，理论上这个服务是不会占用这么大的内存的，查了下原因是因为进程写磁盘失败，导致大量的数据被缓存到了内存中</p>
+<p>于是把问题修复了下，并重启了这个服务，释放了30G左右的内存出来</p>
+<p>过了一段时间后，重新查看磁盘的使用率：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iostat -d -x 2 100</span><br></pre></td></tr></table></figure></p>
+<p>得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Device:         rrqm/s   wrqm/s     r/s     w/s   rsec/s   wsec/s avgrq-sz avgqu-sz   await  svctm  %util</span><br><span class="line">sda               0.00     1.00    0.00    3.00     0.00    56.00    18.67     0.00    0.00   0.00   0.00</span><br><span class="line">sdc               0.00     0.00    0.50   12.50     8.00   112.00     9.23     0.01    0.81   0.50   0.65</span><br><span class="line">sde               0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00   0.00   0.00</span><br><span class="line">sdd               0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00   0.00   0.00</span><br><span class="line">sdb               0.00     3.50   55.00  486.00 11484.00  8572.00    37.07     0.11    0.20   0.11   6.20</span><br><span class="line">dm-0              0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00   0.00   0.00</span><br><span class="line">dm-1              0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00   0.00   0.00</span><br><span class="line">dm-2              0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00   0.00   0.00</span><br><span class="line">dm-3              0.00     0.00    0.00    3.50     0.00    48.00    13.71     0.00    0.00   0.00   0.00</span><br><span class="line">dm-4              0.00     0.00    0.00    0.50     0.00     8.00    16.00     0.00    0.00   0.00   0.00</span><br><span class="line">dm-5              0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00   0.00   0.00</span><br><span class="line">dm-6              0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00   0.00   0.00</span><br><span class="line">dm-7              0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00   0.00   0.00</span><br><span class="line">dm-9              0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00   0.00   0.00</span><br><span class="line">dm-8              0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00   0.00   0.00</span><br></pre></td></tr></table></figure></p>
+<p>可以看到sdc这块盘的io使用率已经降下来了， 此时在这个盘上执行一些mkdir 或者 cp命令速度已经很快了。</p>
+<p>这之后的几天，服务也没有再发生超时的情况</p>
+<p>备注： </p>
+<p>因为这篇文章是写在问题解决后， 所以之前问题的一些现场没有保留，部分数据属于伪造</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2018/12/18/Redis慢日志问题解决/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -371,125 +549,6 @@
 <p>当然如果仍然要读取全部的ZSET中的数据， 可以用ZSCAN命令来不停的扫描， 每次扫描读取一部分</p>
 <p>其实redis的info信息是非常详细的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><span class="line"># Server</span><br><span class="line">redis_version:2.8.19</span><br><span class="line">redis_git_sha1:00000000</span><br><span class="line">redis_git_dirty:0</span><br><span class="line">redis_build_id:bcc7511e1a094fe9</span><br><span class="line">redis_mode:standalone</span><br><span class="line">os:Linux 2.6.32.43-tlinux-1.0.22-default x86_64</span><br><span class="line">arch_bits:64</span><br><span class="line">multiplexing_api:epoll</span><br><span class="line">gcc_version:4.4.6</span><br><span class="line">process_id:17351</span><br><span class="line">run_id:61f2d7ca5a7507914252a0cc53ef7cb96c1f98fb</span><br><span class="line">tcp_port:10002</span><br><span class="line">uptime_in_seconds:66262857</span><br><span class="line">uptime_in_days:766</span><br><span class="line">hz:10</span><br><span class="line">lru_clock:926904</span><br><span class="line">config_file:/data/redis-server/baike_database_master_10002/redis_10002.conf</span><br><span class="line"> </span><br><span class="line"># Clients</span><br><span class="line">connected_clients:177</span><br><span class="line">client_longest_output_list:0</span><br><span class="line">client_biggest_input_buf:0</span><br><span class="line">blocked_clients:0</span><br><span class="line"> </span><br><span class="line"># Memory</span><br><span class="line">used_memory:3870592296</span><br><span class="line">used_memory_human:3.60G</span><br><span class="line">used_memory_rss:4278693888</span><br><span class="line">used_memory_peak:4569335968</span><br><span class="line">used_memory_peak_human:4.26G</span><br><span class="line">used_memory_lua:35840</span><br><span class="line">mem_fragmentation_ratio:1.11</span><br><span class="line">mem_allocator:jemalloc-3.6.0</span><br><span class="line"> </span><br><span class="line"># Persistence</span><br><span class="line">loading:0</span><br><span class="line">rdb_changes_since_last_save:20833780660</span><br><span class="line">rdb_bgsave_in_progress:0</span><br><span class="line">rdb_last_save_time:1495853683</span><br><span class="line">rdb_last_bgsave_status:ok</span><br><span class="line">rdb_last_bgsave_time_sec:17</span><br><span class="line">rdb_current_bgsave_time_sec:-1</span><br><span class="line">aof_enabled:1</span><br><span class="line">aof_rewrite_in_progress:0</span><br><span class="line">aof_rewrite_scheduled:0</span><br><span class="line">aof_last_rewrite_time_sec:35</span><br><span class="line">aof_current_rewrite_time_sec:-1</span><br><span class="line">aof_last_bgrewrite_status:ok</span><br><span class="line">aof_last_write_status:ok</span><br><span class="line">aof_current_size:1445634916</span><br><span class="line">aof_base_size:1165444727</span><br><span class="line">aof_pending_rewrite:0</span><br><span class="line">aof_buffer_length:0</span><br><span class="line">aof_rewrite_buffer_length:0</span><br><span class="line">aof_pending_bio_fsync:0</span><br><span class="line">aof_delayed_fsync:0</span><br><span class="line"> </span><br><span class="line"># Stats</span><br><span class="line">total_connections_received:90906524</span><br><span class="line">total_commands_processed:83533940789</span><br><span class="line">instantaneous_ops_per_sec:1601</span><br><span class="line">total_net_input_bytes:3031104314026</span><br><span class="line">total_net_output_bytes:1957795787473</span><br><span class="line">instantaneous_input_kbps:60.44</span><br><span class="line">instantaneous_output_kbps:480.64</span><br><span class="line">rejected_connections:0</span><br><span class="line">sync_full:2</span><br><span class="line">sync_partial_ok:0</span><br><span class="line">sync_partial_err:0</span><br><span class="line">expired_keys:0</span><br><span class="line">evicted_keys:0</span><br><span class="line">keyspace_hits:16227030786</span><br><span class="line">keyspace_misses:995680173</span><br><span class="line">pubsub_channels:0</span><br><span class="line">pubsub_patterns:0</span><br><span class="line">latest_fork_usec:79994</span><br><span class="line"> </span><br><span class="line"># Replication</span><br><span class="line">role:master</span><br><span class="line">connected_slaves:1</span><br><span class="line">slave0:ip=10.241.00.00,port=1022,state=online,offset=1272093723257,lag=1</span><br><span class="line">master_repl_offset:1272093741351</span><br><span class="line">repl_backlog_active:1</span><br><span class="line">repl_backlog_size:1048576</span><br><span class="line">repl_backlog_first_byte_offset:1272092692776</span><br><span class="line">repl_backlog_histlen:1048576</span><br><span class="line"> </span><br><span class="line"># CPU</span><br><span class="line">used_cpu_sys:525197.25</span><br><span class="line">used_cpu_user:548578.62</span><br><span class="line">used_cpu_sys_children:2437.03</span><br><span class="line">used_cpu_user_children:33747.64</span><br><span class="line"> </span><br><span class="line"># Keyspace</span><br><span class="line">db0:keys=19935578,expires=0,avg_ttl=0</span><br></pre></td></tr></table></figure></p>
 
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2018/12/18/一篇测试/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="jasonjie">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="jasonjie">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/12/18/一篇测试/" itemprop="url">一篇测试</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-18T11:22:54+08:00">
-                2018-12-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            
           
         
       
@@ -1124,152 +1183,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2016/09/17/2016-09-17-Spring源码分析之BeanPostProcessor接口和BeanFactoryPostProcessor接口方法不执行原因分析/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="jasonjie">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="jasonjie">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/09/17/2016-09-17-Spring源码分析之BeanPostProcessor接口和BeanFactoryPostProcessor接口方法不执行原因分析/" itemprop="url">Spring源码分析之BeanPostProcessor接口和BeanFactoryPostProcessor接口方法不执行原因分析</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-09-17T00:00:00+08:00">
-                2016-09-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java开发/" itemprop="url" rel="index">
-                    <span itemprop="name">Java开发</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>首先下面是我的Bean<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2016/09/17/2016-09-17-Spring源码分析之BeanPostProcessor接口和BeanFactoryPostProcessor接口方法不执行原因分析/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </p></div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2016/09/17/2016-09-17-Spring源码分析之doDispatch分发请求逻辑/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1367,6 +1280,152 @@
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2016/09/17/2016-09-17-Spring源码分析之doDispatch分发请求逻辑/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </p></div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2016/09/17/2016-09-17-Spring源码分析之BeanPostProcessor接口和BeanFactoryPostProcessor接口方法不执行原因分析/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="jasonjie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jasonjie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/09/17/2016-09-17-Spring源码分析之BeanPostProcessor接口和BeanFactoryPostProcessor接口方法不执行原因分析/" itemprop="url">Spring源码分析之BeanPostProcessor接口和BeanFactoryPostProcessor接口方法不执行原因分析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-09-17T00:00:00+08:00">
+                2016-09-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java开发/" itemprop="url" rel="index">
+                    <span itemprop="name">Java开发</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>首先下面是我的Bean<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/09/17/2016-09-17-Spring源码分析之BeanPostProcessor接口和BeanFactoryPostProcessor接口方法不执行原因分析/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1758,7 +1817,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1769,7 +1828,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
