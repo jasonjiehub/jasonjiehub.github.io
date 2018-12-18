@@ -262,7 +262,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2016/09/12/2016-09-12-Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)/">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2017/06/09/日志中每段代码执行时间的和不等于整段代码执行的总时间/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="jasonjie">
@@ -281,7 +281,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2016/09/12/2016-09-12-Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)/" itemprop="url">Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)</a></h1>
+                <a class="post-title-link" href="/2017/06/09/日志中每段代码执行时间的和不等于整段代码执行的总时间/" itemprop="url">日志中每段代码执行时间的和不等于整段代码执行的总时间</a></h1>
         
 
         <div class="post-meta">
@@ -293,8 +293,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-09-12T00:00:00+08:00">
-                2016-09-12
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-09T19:06:41+08:00">
+                2017-06-09
               </time>
             
 
@@ -316,8 +316,8 @@
               
               
                 <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java开发/" itemprop="url" rel="index">
-                    <span itemprop="name">Java开发</span>
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
                   </a>
                 </span>
 
@@ -354,302 +354,14 @@
 
       
         
-          <p>ContextLoaderListener类是负责初始化IOC容器，即在我们的web项目中，这里就是IOC容器初始化的入口，由这个类启动IOC容器的初始化。<br>它配置在web.xml中，比如如下配置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;context-param&gt;  </span><br><span class="line">        &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;  </span><br><span class="line">        &lt;param-value&gt;classpath:context/applicationContext.xml&lt;/param-value&gt;  </span><br><span class="line">    &lt;/context-param&gt;  </span><br><span class="line">  </span><br><span class="line">    &lt;!-- Spring监听器 --&gt;  </span><br><span class="line">    &lt;listener&gt;  </span><br><span class="line">        &lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;/listener-class&gt;  </span><br><span class="line">    &lt;/listener&gt;</span><br></pre></td></tr></table></figure></p>
+          <p>代码逻辑：</p>
+<p>def  getInlink()</p>
+<pre><code>A  -&gt; B  -&gt; C -&gt;  D
+</code></pre><p>在tornado中调用getInlink<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">@tornado.gen.coroutine</span><br><span class="line"> </span><br><span class="line">    def get(self):</span><br><span class="line"> </span><br><span class="line">        start2 = int(time.time()*1000)</span><br><span class="line"> </span><br><span class="line">        error, errReason, lstSummary = yield self.getInlink(utfQuery)</span><br><span class="line"> </span><br><span class="line">        print &apos;total use %d&apos; % (int(time.time()*1000)-start2)</span><br></pre></td></tr></table></figure></p>
+<p>实践中，分别记录了上面四个步骤执行的时间， 假设为At, Bt, Ct, Dt，并且记录了getInlink总的时间，假设为ADt（调用getInlink方法到返回的时间）<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2016/09/12/2016-09-12-Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2016/09/12/2016-09-12-Spring IOC学习心得之注册bean的依赖关系/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="jasonjie">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="jasonjie">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/09/12/2016-09-12-Spring IOC学习心得之注册bean的依赖关系/" itemprop="url">Spring IOC学习心得之注册bean的依赖关系</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-09-12T00:00:00+08:00">
-                2016-09-12
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java开发/" itemprop="url" rel="index">
-                    <span itemprop="name">Java开发</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>registerDependentBean方法的解析（注册bean的依赖关系）<br>源码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">public void registerDependentBean(String beanName, String dependentBeanName) &#123;  </span><br><span class="line">        // A quick check for an existing entry upfront, avoiding synchronization...  </span><br><span class="line">        String canonicalName = canonicalName(beanName);  </span><br><span class="line">        /*  </span><br><span class="line">        dependentBeanMap中存储的是目前已经注册的依赖这个bean的所有bean,这里从这个集合中获取目前所有已经注册的依赖beanName的bean集合,  </span><br><span class="line">        然后看这个集合中是否包含dependentBeanName,即是否已经注册,如果包含则表示已经注册,则直接返回,否则,将bean依赖关系添加到两个map缓存即完成注册  </span><br><span class="line">            */  </span><br><span class="line">        Set&lt;String&gt; dependentBeans = this.dependentBeanMap.get(canonicalName);  </span><br><span class="line">        if (dependentBeans != null &amp;&amp; dependentBeans.contains(dependentBeanName)) &#123;  </span><br><span class="line">            return;  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        // No entry yet -&gt; fully synchronized manipulation of the dependentBeans Set  </span><br><span class="line">        synchronized (this.dependentBeanMap) &#123;  </span><br><span class="line">            dependentBeans = this.dependentBeanMap.get(canonicalName);  </span><br><span class="line">            if (dependentBeans == null) &#123;  </span><br><span class="line">                dependentBeans = new LinkedHashSet&lt;&gt;(8);  </span><br><span class="line">                this.dependentBeanMap.put(canonicalName, dependentBeans);  </span><br><span class="line">            &#125;  </span><br><span class="line">            dependentBeans.add(dependentBeanName);  </span><br><span class="line">        &#125;  </span><br><span class="line">        synchronized (this.dependenciesForBeanMap) &#123;  </span><br><span class="line">            Set&lt;String&gt; dependenciesForBean = this.dependenciesForBeanMap.get(dependentBeanName);  </span><br><span class="line">            if (dependenciesForBean == null) &#123;  </span><br><span class="line">                dependenciesForBean = new LinkedHashSet&lt;&gt;(8);  </span><br><span class="line">                this.dependenciesForBeanMap.put(dependentBeanName, dependenciesForBean);  </span><br><span class="line">            &#125;  </span><br><span class="line">            dependenciesForBean.add(canonicalName);  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2016/09/12/2016-09-12-Spring IOC学习心得之注册bean的依赖关系/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2016/09/11/2016-09-11-Spring IOC学习心得之Bean对IOC容器的感知/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="jasonjie">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="jasonjie">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/09/11/2016-09-11-Spring IOC学习心得之Bean对IOC容器的感知/" itemprop="url">Spring IOC学习心得之Bean对IOC容器的感知</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-09-11T00:00:00+08:00">
-                2016-09-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java开发/" itemprop="url" rel="index">
-                    <span itemprop="name">Java开发</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>容器管理的Bean一般不需要了解容器的状态和直接使用Bean，但是在某些情况下，是需要在Bean中直接对IOC容器进行操作的，这时候，就需要在Bean中设定对容器的感知。Spring IOC也提供了该功能，它是通过特定的aware接口来完成的。aware接口有如下这些：<br>BeanNameAware：可以在Bean中得到它在IOC容器中的Bean的实例名称<br>BeanFactoryAware：可以在Bean中得到Bean所在的IOC容器，从而直接在Bean中使用IOC容器的服务<br>ApplicationContextAware：可以在Bean中得到Bean所在的应用上下文，从而直接在Bean中使用应用上下文的服务<br>MessageSourceAware：在Bean中可以得到消息源<br>ApplicationEventPublisherAware：在Bean中可以得到应用上下文的事件发布器，从而可以在Bean中发布应用上下文的事件<br>ResourceLoaderAware：在Bean中可以得到resourceloader，从而在Bean中使用ResourceLoader加载外部对应的Resource资源<br>要在自定义的Bean中获取上述资源，只需要让Bean实现对应的接口，并覆写set方法，如下：<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2016/09/11/2016-09-11-Spring IOC学习心得之Bean对IOC容器的感知/#more" rel="contents">
+            <a class="btn" href="/2017/06/09/日志中每段代码执行时间的和不等于整段代码执行的总时间/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -700,7 +412,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2016/09/11/2016-09-11-Spring IOC学习心得之IOC容器的初始化过程/">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2017/06/03/请求方报超时，服务日志中记录的时间却少有超时/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="jasonjie">
@@ -719,7 +431,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2016/09/11/2016-09-11-Spring IOC学习心得之IOC容器的初始化过程/" itemprop="url">Spring IOC学习心得之IOC容器的初始化过程</a></h1>
+                <a class="post-title-link" href="/2017/06/03/请求方报超时，服务日志中记录的时间却少有超时/" itemprop="url">请求方报超时，服务日志中记录的时间却少有超时</a></h1>
         
 
         <div class="post-meta">
@@ -731,8 +443,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-09-11T00:00:00+08:00">
-                2016-09-11
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-03T19:02:56+08:00">
+                2017-06-03
               </time>
             
 
@@ -754,8 +466,8 @@
               
               
                 <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java开发/" itemprop="url" rel="index">
-                    <span itemprop="name">Java开发</span>
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
                   </a>
                 </span>
 
@@ -792,10 +504,16 @@
 
       
         
-          <p>注：本文大多数内容都是摘自《Spring技术内幕》这本书<br>简单来说，Ioc容器的初始化过程是在refresh（）方法中启动的，包括BeanDefinition的Resource定位，载入和注册三个过程。<br>第一：Resource的定位<br>这个Resource指的是BeanDefinition的资源定位，由ResourceLoader通过统一的Resource接口来完成。文件系统中的Bean定义信息可以使用FileSystemResource来进行抽象，类路径中的Bean定义信息可以使用ClassPathResource来抽象。<br>第二： BeanDefinition的载入<br>上面已经定位了资源Resource的位置，接下来就是将Bean定义表示成Ioc容器内部的结果，即读取进来封装成BeanDefinition。<br>
+          <p>请求方报超时的比例大概有4%</p>
+<p>他们设置的超时时间是500ms</p>
+<p>但是我们统计日志，服务时间超过500ms的日志很少</p>
+<p>原因是什么呢？</p>
+<p>超时原因分析：</p>
+<p>1、请求内容太长</p>
+<p>根据请求方超时日志， 大多数query的长度都是1w以上，这些query我手动请求，响应时间的确大于500ms， 在服务端还没有处理完的时候，客户端已经超时断开了<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2016/09/11/2016-09-11-Spring IOC学习心得之IOC容器的初始化过程/#more" rel="contents">
+            <a class="btn" href="/2017/06/03/请求方报超时，服务日志中记录的时间却少有超时/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -846,7 +564,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2016/09/10/2016-09-10-Spring IOC学习心得之BeanPostProcessor，BeanNameAware，BeanClassLoaderAware，BeanFactoryAware接口是如何起作用的/">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2017/05/24/scrapy中自定义过滤规则以及start-urls不进过滤器的问题/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="jasonjie">
@@ -865,7 +583,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2016/09/10/2016-09-10-Spring IOC学习心得之BeanPostProcessor，BeanNameAware，BeanClassLoaderAware，BeanFactoryAware接口是如何起作用的/" itemprop="url">Spring IOC学习心得之BeanPostProcessor，BeanNameAware，BeanClassLoaderAware，BeanFactoryAware接口是如何起作用的</a></h1>
+                <a class="post-title-link" href="/2017/05/24/scrapy中自定义过滤规则以及start-urls不进过滤器的问题/" itemprop="url">scrapy中自定义过滤规则以及start_urls不进过滤器的问题</a></h1>
         
 
         <div class="post-meta">
@@ -877,8 +595,759 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-09-10T00:00:00+08:00">
-                2016-09-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-24T18:57:22+08:00">
+                2017-05-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>为什么要自定义过滤规则呢？ 首先，我们需要过滤，但是不是说抓一次就不抓了，因为我们的抓取是一段时间抓取一次</p>
+<p>自定义策略如下：</p>
+<p>首先我试图直接继承RFPDupeFilter</p>
+<p>在settings.py同级的目录下新建dupefilter.py文件，按照网上说的方法，写了内容如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">from scrapy.dupefilter import RFPDupeFilter</span><br><span class="line">import hashlib</span><br><span class="line">from scrapy.utils.request import request_fingerprint</span><br><span class="line">from scrapy.dupefilter import BaseDupeFilter</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">class URLFilter(RFPDupeFilter):</span><br><span class="line"> </span><br><span class="line">    def __init(self):</span><br><span class="line">        RFPDupeFilter.__init__(self)</span><br><span class="line"> </span><br><span class="line">    def request_seen(self, request):</span><br><span class="line"> </span><br><span class="line">        fp = self.request_fingerprint(request)</span><br><span class="line">        added = self.server.sadd(self.key, fp)</span><br><span class="line"> </span><br><span class="line">        return added == 0</span><br></pre></td></tr></table></figure></p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/05/24/scrapy中自定义过滤规则以及start-urls不进过滤器的问题/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2017/05/18/scrapy自定义Request的缓存策略（减少内存占用）/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="jasonjie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jasonjie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/05/18/scrapy自定义Request的缓存策略（减少内存占用）/" itemprop="url">scrapy自定义Request的缓存策略（减少内存占用）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-18T18:54:34+08:00">
+                2017-05-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>scrapy-redis大概的架构：</p>
+<p>从redis中拉url，构造Request对象，写入SCHEDULER_QUEUE_CLASS定义的队列中，调度器从队列中拉取Request进行抓取</p>
+<p>想自定义Request的初衷主要是为了减少内存的占用，当然虽然我们的内存消耗的也不是那么多，也就几个G</p>
+<p>scrapy自带的几个队列有这么几个：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">* scrapy_redis.queue.SpiderQueue：队列。先入先出队列，先放入Redis的请求优先爬取；</span><br><span class="line">* scrapy_redis.queue.SpiderStack：栈。后放入Redis的请求会优先爬取；</span><br><span class="line">* scrapy_redis.queue.SpiderPriorityQueue：优先级队列。根据优先级算法计算哪个先爬哪个后爬，比较麻烦</span><br></pre></td></tr></table></figure>
+<p>简单看下PriorityQueue的源码：<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/05/18/scrapy自定义Request的缓存策略（减少内存占用）/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </p></div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2017/05/18/tornado异步请求响应速度的实例测试/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="jasonjie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jasonjie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/05/18/tornado异步请求响应速度的实例测试/" itemprop="url">tornado异步请求响应速度的实例测试</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-18T18:45:55+08:00">
+                2017-05-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>为什么要用异步处理？</p>
+<p>大部分Web应用（包括我们之前的例子）都是阻塞性质的，也就是说当一个请求被处理时，这个进程就会被挂起直至请求完成。在大多数情况下，Tornado处理的Web请求完成得足够快使得这个问题并不需要被关注。然而，对于那些需要一些时间来完成的操作（像大数据库的请求或外部API），这意味着应用程序被有效的锁定直至处理结束，很明显这在可扩展性上出现了问题。</p>
+<p>不过，Tornado给了我们更好的方法来处理这种情况。应用程序在等待第一个处理完成的过程中，让I/O循环打开以便服务于其他客户端，直到处理完成时启动一个请求并给予反馈，而不再是等待请求完成的过程中挂起进程。</p>
+<p>1、首先来看一个没有用异步的普通的tornado服务的例子<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/05/18/tornado异步请求响应速度的实例测试/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </p></div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2017/05/16/scrapy自定义网页中图片的下载策略/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="jasonjie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jasonjie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/05/16/scrapy自定义网页中图片的下载策略/" itemprop="url">scrapy自定义网页中图片的下载策略</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-16T18:52:32+08:00">
+                2017-05-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>自定义的初衷是：想修改保存文件的默认名称， 我们希望保留图片原始的文件名。 此外，scrapy图片的下载过滤策略是用了过期时间，可以通过在settings.py中配置如下参数来设置图片的过期时间：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">IMAGES_EXPIRES = 90</span><br></pre></td></tr></table></figure></p>
+<p>但是对我们抓取百度百科的业务，一张图片如果已经抓取过，则不需要再重新抓取，所以这个是一次性的， 因为图片发生变化的可能性很小，所以没有必要做重复性的抓取</p>
+<p>于是，基于需求我覆写了ImagesPipeline类<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/05/16/scrapy自定义网页中图片的下载策略/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </p></div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2017/05/14/写磁盘太慢导致服务超时问题分析/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="jasonjie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jasonjie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/05/14/写磁盘太慢导致服务超时问题分析/" itemprop="url">写磁盘太慢导致服务超时问题分析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-14T17:26:09+08:00">
+                2017-05-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>服务逻辑：</p>
+<pre><code>接收客户端的请求参数，写文件到本地磁盘
+</code></pre><p>问题发现：</p>
+<pre><code>客户端报超时， 每天日志理论上是有几万条的，但是近几天只收到了几条
+</code></pre><p>问题分析：</p>
+<pre><code>其实最开始的时候，以为是服务端处理不过来导致的，因为最开始服务端只有两个服务进程，后来增加了服务进程数，但是超时问题仍然没有得到解决
+
+也怪自己没有做压力测试，如果做了压测，那么服务处理不过来的问题其实一开始就应该被排除的
+</code></pre>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/05/14/写磁盘太慢导致服务超时问题分析/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2016/09/20/2016-09-20-Spring源码分析之ProxyFactoryBean方式实现Aop功能的分析/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="jasonjie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jasonjie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/09/20/2016-09-20-Spring源码分析之ProxyFactoryBean方式实现Aop功能的分析/" itemprop="url">Spring源码分析之ProxyFactoryBean方式实现Aop功能的分析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-09-20T00:00:00+08:00">
+                2016-09-20
               </time>
             
 
@@ -938,13 +1407,15 @@
 
       
         
-          <ol>
-<li>首先说下BeanPostProcessor接口中的两个方法，如下：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">package org.springframework.beans.factory.config;  </span><br><span class="line">  </span><br><span class="line">import org.springframework.beans.BeansException;  </span><br><span class="line">  </span><br><span class="line">public interface BeanPostProcessor &#123;  </span><br><span class="line">  </span><br><span class="line">        //Bean初始化的前置处理器  </span><br><span class="line">    Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException;  </span><br><span class="line">  </span><br><span class="line">    //Bean初始化的后置处理器  </span><br><span class="line">    Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException;  </span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
+          <p>实现Aop功能有两种方式，</p>
+<ol>
+<li>ProxyFactoryBean方式： 这种方式是通过配置实现</li>
+<li>ProxyFactory方式：这种方式是通过编程实现<br>这里只说ProxyFactoryBean方式<br>首先说下具体的配置，一个例子如下：</li>
 </ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id=&quot;testAdvisor&quot; class=&quot;com.abc.TestAdvisor&quot;</span><br><span class="line">	&lt;property name=&quot;pointcut&quot;  ref=&quot;bookPointcut&quot;/&gt; </span><br><span class="line">        &lt;property name=&quot;advice&quot; ref=&quot;aroundMethod&quot;&gt;&lt;/property&gt;</span><br><span class="line">&lt;/bean&gt;</span><br><span class="line">&lt;bean id=&quot;testAop&quot; class=&quot;org.springframeword.aop.ProxyFactoryBean&quot;&gt;</span><br><span class="line">      &lt;property name=&quot;proxyInterfaces&quot;&gt;</span><br><span class="line">              &lt;value&gt;com.test.AbcInterface&lt;/value&gt;</span><br><span class="line">      &lt;/property&gt;</span><br><span class="line">      &lt;property name=&quot;target&quot;&gt;</span><br><span class="line">              &lt;bean class=&quot;com.abc.TestTarget&quot;/&gt;</span><br><span class="line">      &lt;/property&gt;</span><br><span class="line">      &lt;property name=&quot;interceptorNames&quot;&gt;</span><br><span class="line">              &lt;list&gt;</span><br><span class="line">                        &lt;value&gt;testAdvisor&lt;/value&gt;  </span><br><span class="line">              &lt;/list&gt;</span><br><span class="line">      &lt;/property&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2016/09/10/2016-09-10-Spring IOC学习心得之BeanPostProcessor，BeanNameAware，BeanClassLoaderAware，BeanFactoryAware接口是如何起作用的/#more" rel="contents">
+            <a class="btn" href="/2016/09/20/2016-09-20-Spring源码分析之ProxyFactoryBean方式实现Aop功能的分析/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -995,7 +1466,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2016/09/08/2016-09-08-Spring AOP中declare-parents为特定的类增加新的功能/">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2016/09/20/2016-09-20-Spring源码分析之SpringMVC的DispatcherServlet是如何处理Http请求的/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="jasonjie">
@@ -1014,7 +1485,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2016/09/08/2016-09-08-Spring AOP中declare-parents为特定的类增加新的功能/" itemprop="url">Spring AOP中declare-parents为特定的类增加新的功能</a></h1>
+                <a class="post-title-link" href="/2016/09/20/2016-09-20-Spring源码分析之SpringMVC的DispatcherServlet是如何处理Http请求的/" itemprop="url">Spring源码分析之SpringMVC的DispatcherServlet是如何处理Http请求的</a></h1>
         
 
         <div class="post-meta">
@@ -1026,8 +1497,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-09-08T00:00:00+08:00">
-                2016-09-08
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-09-20T00:00:00+08:00">
+                2016-09-20
               </time>
             
 
@@ -1087,19 +1558,165 @@
 
       
         
-          <p>如果有这样一个需求，为一个已知的API添加一个新的功能。</p>
-<p>由于是已知的API，我们不能修改其类，只能通过外部包装。但是如果通过之前的AOP前置或后置通知，又不太合理，最简单的办法就是实现某个我们自定义的接口，这个接口包含了想要添加的方法。</p>
-<p>但是JAVA不是一门动态的语言，无法再编译后动态添加新的功能，这个时候就可以使用 aop:declare-parents 来做了.<br>
+          <p>一般我们会在web.xml文件中配置DispatcherServlet，比如如下配置方式：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;servlet&gt;  </span><br><span class="line">        &lt;servlet-name&gt;dispatcherServlet&lt;/servlet-name&gt;  </span><br><span class="line">        &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;  </span><br><span class="line">        &lt;init-param&gt;  </span><br><span class="line">            &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;  </span><br><span class="line">            &lt;param-value&gt;classpath:dispatcher-servlet.xml&lt;/param-value&gt;  </span><br><span class="line">        &lt;/init-param&gt;  </span><br><span class="line">        &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;  </span><br><span class="line">    &lt;/servlet&gt;  </span><br><span class="line">      </span><br><span class="line">    &lt;servlet-mapping&gt;  </span><br><span class="line">        &lt;servlet-name&gt;dispatcherServlet&lt;/servlet-name&gt;  </span><br><span class="line">        &lt;url-pattern&gt;/&lt;/url-pattern&gt;  </span><br><span class="line">    &lt;/servlet-mapping&gt;</span><br></pre></td></tr></table></figure></p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2016/09/08/2016-09-08-Spring AOP中declare-parents为特定的类增加新的功能/#more" rel="contents">
+            <a class="btn" href="/2016/09/20/2016-09-20-Spring源码分析之SpringMVC的DispatcherServlet是如何处理Http请求的/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
           <!--/noindex-->
         
       
-    </p></div>
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2016/09/18/Java开发Maven插件/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="jasonjie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jasonjie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/09/18/Java开发Maven插件/" itemprop="url">Java开发Maven插件</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-09-18T20:16:17+08:00">
+                2016-09-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java开发/" itemprop="url" rel="index">
+                    <span itemprop="name">Java开发</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>这里需要两个工程，一个是插件工程，另外一个是插件测试工程</p>
+<p>首先介绍下插件工程：</p>
+<p>新建一个web项目，名称为myMavenPlugin，pom文件对该工程的相关配置信息为（注意这是关于项目自身的信息）：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">&lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;my-maven-plugin&lt;/artifactId&gt;</span><br><span class="line">  &lt;version&gt;1.0.1-SNAPSHOT&lt;/version&gt;</span><br><span class="line">  &lt;packaging&gt;maven-plugin&lt;/packaging&gt;</span><br><span class="line"> </span><br><span class="line">  &lt;name&gt;my-maven-plugin&lt;/name&gt;</span><br><span class="line">  &lt;url&gt;http://maven.apache.org&lt;/url&gt;</span><br><span class="line"> </span><br><span class="line">  &lt;properties&gt;</span><br><span class="line">    &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;</span><br><span class="line">  &lt;/properties&gt;</span><br></pre></td></tr></table></figure></p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/09/18/Java开发Maven插件/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
     
     
     
@@ -1134,7 +1751,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1180,7 +1797,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">40</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1202,7 +1819,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

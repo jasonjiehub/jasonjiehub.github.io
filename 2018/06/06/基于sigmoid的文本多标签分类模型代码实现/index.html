@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Python,机器学习,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="sigmoid一般是用来做二分类的，它是将一个标量的数字转换成[0,1]之间的一个概率值，如果概率值大于0.5， 则判定为是某个分类，否则则不是某个分类，公式如下：本文基于sigmoid做了一个将一段长文本打上多个标签的算法模型，首先声明，我的模型最终的效果不好，因为我的文本很长，而且采用的模型很简单，就一层神经网络，权当练手。 数据集文件的格式为每行一个样本，以制表符分隔。第一列为文本的多个标签">
+<meta name="keywords" content="Python,机器学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于sigmoid的文本多标签分类模型代码实现">
+<meta property="og:url" content="http://www.denglinjie.com/2018/06/06/基于sigmoid的文本多标签分类模型代码实现/index.html">
+<meta property="og:site_name" content="jasonjie">
+<meta property="og:description" content="sigmoid一般是用来做二分类的，它是将一个标量的数字转换成[0,1]之间的一个概率值，如果概率值大于0.5， 则判定为是某个分类，否则则不是某个分类，公式如下：本文基于sigmoid做了一个将一段长文本打上多个标签的算法模型，首先声明，我的模型最终的效果不好，因为我的文本很长，而且采用的模型很简单，就一层神经网络，权当练手。 数据集文件的格式为每行一个样本，以制表符分隔。第一列为文本的多个标签">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://www.denglinjie.com/upload_image/6.png">
+<meta property="og:updated_time" content="2018-12-18T12:00:41.680Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于sigmoid的文本多标签分类模型代码实现">
+<meta name="twitter:description" content="sigmoid一般是用来做二分类的，它是将一个标量的数字转换成[0,1]之间的一个概率值，如果概率值大于0.5， 则判定为是某个分类，否则则不是某个分类，公式如下：本文基于sigmoid做了一个将一段长文本打上多个标签的算法模型，首先声明，我的模型最终的效果不好，因为我的文本很长，而且采用的模型很简单，就一层神经网络，权当练手。 数据集文件的格式为每行一个样本，以制表符分隔。第一列为文本的多个标签">
+<meta name="twitter:image" content="http://www.denglinjie.com/upload_image/6.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.denglinjie.com/2018/06/06/基于sigmoid的文本多标签分类模型代码实现/">
+
+
+
+
+
+  <title>基于sigmoid的文本多标签分类模型代码实现 | jasonjie</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">jasonjie</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2018/06/06/基于sigmoid的文本多标签分类模型代码实现/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="jasonjie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jasonjie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">基于sigmoid的文本多标签分类模型代码实现</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-06T19:58:31+08:00">
+                2018-06-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>sigmoid一般是用来做二分类的，它是将一个标量的数字转换成[0,1]之间的一个概率值，如果概率值大于0.5， 则判定为是某个分类，否则则不是某个分类，公式如下：<br><img src="/upload_image/6.png" alt=""><br>本文基于sigmoid做了一个将一段长文本打上多个标签的算法模型，首先声明，我的模型最终的效果不好，因为我的文本很长，而且采用的模型很简单，就一层神经网络，权当练手。</p>
+<p>数据集文件的格式为每行一个样本，以制表符分隔。第一列为文本的多个标签，以逗号分隔，第二列为文本内容</p>
+<p>和我之前写的一篇基于softmax多文本多分类模型的结构差不多，代码分成两个文件</p>
+<p>第一个文件: data_loader.py</p>
+<p>主要用来读取训练数据，并预处理，代码如下：<br><a id="more"></a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br></pre></td><td class="code"><pre><span class="line"># coding: utf-8</span><br><span class="line"> </span><br><span class="line">import sys</span><br><span class="line">from collections import Counter</span><br><span class="line">import pdb</span><br><span class="line">import numpy as np</span><br><span class="line">import tensorflow.contrib.keras as kr</span><br><span class="line"> </span><br><span class="line">if sys.version_info[0] &gt; 2:</span><br><span class="line">    is_py3 = True</span><br><span class="line">else:</span><br><span class="line">    reload(sys)</span><br><span class="line">    sys.setdefaultencoding(&quot;utf-8&quot;)</span><br><span class="line">    is_py3 = False</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">def native_word(word, encoding=&apos;utf-8&apos;):</span><br><span class="line">    &quot;&quot;&quot;如果在python2下面使用python3训练的模型，可考虑调用此函数转化一下字符编码&quot;&quot;&quot;</span><br><span class="line">    if not is_py3:</span><br><span class="line">        return word.encode(encoding)</span><br><span class="line">    else:</span><br><span class="line">        return word</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">def native_content(content):</span><br><span class="line">    if not is_py3:</span><br><span class="line">        return content.decode(&apos;utf-8&apos;)</span><br><span class="line">    else:</span><br><span class="line">        return content</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">def open_file(filename, mode=&apos;r&apos;):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    常用文件操作，可在python2和python3间切换.</span><br><span class="line">    mode: &apos;r&apos; or &apos;w&apos; for read or write</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    if is_py3:</span><br><span class="line">        return open(filename, mode, encoding=&apos;utf-8&apos;, errors=&apos;ignore&apos;)</span><br><span class="line">    else:</span><br><span class="line">        return open(filename, mode)</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">def read_file(filename):</span><br><span class="line">    &quot;&quot;&quot;读取文件数据&quot;&quot;&quot;</span><br><span class="line">    contents, labels = [], []</span><br><span class="line">    with open_file(filename) as f:</span><br><span class="line">        for line in f:</span><br><span class="line">            try:</span><br><span class="line">                p = line.strip().split(&apos;\t&apos;)</span><br><span class="line">                label_lst = p[0].split(&apos;,&apos;)</span><br><span class="line">                content = p[1]   </span><br><span class="line">                if content:</span><br><span class="line">                    contents.append(list(native_content(content)))</span><br><span class="line">                    label_lst = [native_content(label) for label in label_lst]   </span><br><span class="line">                    #多标签 </span><br><span class="line">                    labels.append(label_lst)</span><br><span class="line">            except:</span><br><span class="line">                pass</span><br><span class="line">    return contents, labels</span><br><span class="line"> </span><br><span class="line">#构建词汇表，使用字符级的表示，这一函数会将词汇表存储下来，避免每一次重复处理;</span><br><span class="line">def build_vocab(train_dir, vocab_dir, vocab_size=5000):</span><br><span class="line">    &quot;&quot;&quot;根据训练集构建词汇表，存储&quot;&quot;&quot;</span><br><span class="line">    #train, test, val文件的格式为： 分类 文字</span><br><span class="line">    data_train, _ = read_file(train_dir)</span><br><span class="line"> </span><br><span class="line">    all_data = []</span><br><span class="line">    for content in data_train:</span><br><span class="line">        all_data.extend(content)</span><br><span class="line">    counter = Counter(all_data) #统计所有文档中每个字出现的次数 格式：&#123;&apos;c&apos;: 3, &apos;a&apos;: 1, &apos;b&apos;: 1&#125; </span><br><span class="line">    count_pairs = counter.most_common(vocab_size - 1) #取出现次数最多的部分, 格式：[(&apos;c&apos;, 3), (&apos;a&apos;, 1)]</span><br><span class="line">    words, _ = list(zip(*count_pairs)) #格式：[(&apos;c&apos;, &apos;a&apos;), (3, 1)], words格式为：(&apos;c&apos;, &apos;a&apos;)</span><br><span class="line">    # 添加一个 &lt;PAD&gt; 来将所有文本pad为同一长度</span><br><span class="line">    words = [&apos;&lt;PAD&gt;&apos;] + list(words)</span><br><span class="line">    open_file(vocab_dir, mode=&apos;w&apos;).write(&apos;\n&apos;.join(words) + &apos;\n&apos;)  #vocab_dir里面就是处理后的词表，每行一个字</span><br><span class="line"> </span><br><span class="line">#读取上一步存储的词汇表，转换为&#123;词：id&#125;表示;</span><br><span class="line">def read_vocab(vocab_dir):</span><br><span class="line">    &quot;&quot;&quot;读取词汇表&quot;&quot;&quot;</span><br><span class="line">    # words = open_file(vocab_dir).read().strip().split(&apos;\n&apos;)</span><br><span class="line">    with open_file(vocab_dir) as fp:</span><br><span class="line">        # 如果是py2 则每个值都转化为unicode</span><br><span class="line">        words = [native_content(_.strip()) for _ in fp.readlines()]</span><br><span class="line">    word_to_id = dict(zip(words, range(len(words))))</span><br><span class="line">    return words, word_to_id</span><br><span class="line"> </span><br><span class="line"># 将分类目录固定，转换为&#123;类别: id&#125;表示;</span><br><span class="line">def read_category(vocab_file):</span><br><span class="line">    categories = []</span><br><span class="line">    for line in  open(vocab_file, &apos;r&apos;):</span><br><span class="line">        categories += line.strip().split(&apos;\t&apos;)[0].split(&apos;,&apos;)</span><br><span class="line">    </span><br><span class="line">    categories = set(categories)    </span><br><span class="line">    categories = [native_content(x) for x in categories]</span><br><span class="line">    cat_to_id = dict(zip(categories, range(len(categories))))</span><br><span class="line"> </span><br><span class="line">    return categories, cat_to_id</span><br><span class="line"> </span><br><span class="line">#将一条由id表示的数据重新转换为文字;</span><br><span class="line">def to_words(content, words):</span><br><span class="line">    &quot;&quot;&quot;将id表示的内容转换为文字&quot;&quot;&quot;</span><br><span class="line">    return &apos;&apos;.join(words[x] for x in content)</span><br><span class="line"> </span><br><span class="line">#将数据集从文字转换为固定长度的id序列表示;</span><br><span class="line">def process_file(filename, word_to_id, cat_to_id, max_length=600):</span><br><span class="line">    &quot;&quot;&quot;将文件转换为id表示&quot;&quot;&quot;</span><br><span class="line">    contents, labels = read_file(filename)</span><br><span class="line"> </span><br><span class="line">    data_id, label_id = [], [] </span><br><span class="line">    for i in range(len(contents)):</span><br><span class="line">        #实际就是将一篇文档的词id向量和一个分类id对应起来</span><br><span class="line"> </span><br><span class="line">        #data_id中每个元素是一篇文档的词id构成的向量</span><br><span class="line">        data_id.append([word_to_id[x] for x in contents[i] if x in word_to_id])</span><br><span class="line"> </span><br><span class="line">        #label_id， 每篇文档对应一个分类id，这个分类id是与一篇文档的词id向量对应</span><br><span class="line">        label_id.append([cat_to_id[label] for label in labels[i]]) </span><br><span class="line"> </span><br><span class="line">    # 使用keras提供的pad_sequences来将文本pad为固定长度</span><br><span class="line">    #因为data_id中每个元素都是一个由一篇文档中的字组成的向量，而每篇文档长度不同，所以每篇文档对应的向量元素个数不同，所以这里要将他们格式化为同一长度，策略就是高位补0</span><br><span class="line">    x_pad = kr.preprocessing.sequence.pad_sequences(data_id, max_length) </span><br><span class="line">#    y_pad = kr.utils.to_categorical(label_id, num_classes=len(cat_to_id))  # 将标签转换为one-hot表示</span><br><span class="line">    y_pad = parse_multi_category(label_id, len(cat_to_id))</span><br><span class="line"> </span><br><span class="line">    return x_pad, y_pad</span><br><span class="line"> </span><br><span class="line">def parse_multi_category(label_ids, label_axis):</span><br><span class="line">    new_label_ids = []</span><br><span class="line">    for label in label_ids:</span><br><span class="line">        l = np.zeros(label_axis)  </span><br><span class="line">        for index in label:</span><br><span class="line">            l[index] = 1</span><br><span class="line">        new_label_ids.append(l)</span><br><span class="line"> </span><br><span class="line">    return np.array(new_label_ids)</span><br><span class="line"> </span><br><span class="line">#为神经网络的训练准备经过shuffle的批次的数据。</span><br><span class="line">#x为所有文档的词id向量构成的集合，是np.array类型</span><br><span class="line">#y为所有文档对应的标签的one-hot向量集合</span><br><span class="line">#注意：batch_iter这个函数返回的是一个迭代器</span><br><span class="line">def batch_iter(x, y, batch_size=64):</span><br><span class="line">    &quot;&quot;&quot;生成批次数据&quot;&quot;&quot;</span><br><span class="line">    data_len = len(x)</span><br><span class="line">    num_batch = int((data_len - 1) / batch_size) + 1  #计算每个批次取的数据量</span><br><span class="line"> </span><br><span class="line">    #np.random.permutation是随机打乱一个数组, 比如将[0,1,2,3] 打乱成[3,1,0,2]</span><br><span class="line">    #np.arange是构造一个[0, data_len]的列表</span><br><span class="line">    indices = np.random.permutation(np.arange(data_len))</span><br><span class="line">    x_shuffle = x[indices]  #基于一个打乱的索引顺序indics，分别从x中取出对应位置的向量，并按照这个顺序组成新的x，实际就是打乱x的向量顺序</span><br><span class="line">    y_shuffle = y[indices]</span><br><span class="line"> </span><br><span class="line">    for i in range(num_batch):</span><br><span class="line">        start_id = i * batch_size</span><br><span class="line">        end_id = min((i + 1) * batch_size, data_len)</span><br><span class="line">        yield x_shuffle[start_id:end_id], y_shuffle[start_id:end_id]  #每次从打乱顺序后的x和y中依次取一个批次的数</span><br></pre></td></tr></table></figure></p>
+<p>接下来是模型的实现：run_sigmoid.py</p>
+<p>代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#-*- coding:utf8 -*-</span><br><span class="line"> </span><br><span class="line">import pdb</span><br><span class="line">import os</span><br><span class="line">import tensorflow as tf</span><br><span class="line">import numpy as np</span><br><span class="line">from data_loader import read_vocab, read_category, batch_iter, process_file, build_vocab</span><br><span class="line"> </span><br><span class="line">train_file = &apos;data/baidu_tag_one_train.lst&apos;</span><br><span class="line">test_file = &apos;data/baidu_tag_one_test.lst&apos;</span><br><span class="line">vocab_file = &apos;data/baike_category_vocab.lst&apos;</span><br><span class="line">all_file = &apos;data/baidu_tag_one_all.lst&apos;</span><br><span class="line"> </span><br><span class="line">max_vocab_size = 5000</span><br><span class="line">seq_length = 600 #输入x的维度</span><br><span class="line">num_epochs = 10</span><br><span class="line">batch_size = 64</span><br><span class="line"> </span><br><span class="line">def feed_data(x_batch, y_batch):</span><br><span class="line">    feed_dict = &#123;</span><br><span class="line">        x: x_batch,</span><br><span class="line">        y_: y_batch</span><br><span class="line">    &#125;</span><br><span class="line">    return feed_dict</span><br><span class="line"> </span><br><span class="line">if not os.path.exists(vocab_file):</span><br><span class="line">    build_vocab(all_file, vocab_file, max_vocab_size)</span><br><span class="line">print &apos;build vocab over&apos;</span><br><span class="line">#全部分类，分类对应的id</span><br><span class="line">categorys, cat_to_id = read_category(all_file)</span><br><span class="line">print &apos;read category over&apos;</span><br><span class="line">words, word_to_id = read_vocab(vocab_file)</span><br><span class="line">print &apos;read vocab over&apos;</span><br><span class="line">x_train, y_train = process_file(train_file, word_to_id, cat_to_id, seq_length)</span><br><span class="line"> </span><br><span class="line">print &apos;process file over&apos;</span><br><span class="line">num_classes = len(cat_to_id)</span><br><span class="line">#定义模型</span><br><span class="line"> </span><br><span class="line">with tf.device(&apos;/cpu:0&apos;):</span><br><span class="line">    x = tf.placeholder(tf.float32, [None, seq_length], name=&apos;input_x&apos;)</span><br><span class="line">    y_ = tf.placeholder(tf.float32, [None, num_classes], name=&apos;input_y&apos;)</span><br><span class="line">    </span><br><span class="line">#    w = tf.Variable(tf.zeros([seq_length, num_classes]))</span><br><span class="line">#    b = tf.Variable(tf.zeros([num_classes]))</span><br><span class="line">    w = tf.Variable(tf.truncated_normal(shape=[seq_length, num_classes], mean=0, stddev=1))</span><br><span class="line">    b = tf.Variable(tf.truncated_normal(shape=[num_classes], mean=0, stddev=1)) </span><br><span class="line"> </span><br><span class="line">    logits = tf.matmul(x,w) + b    </span><br><span class="line">    y = tf.sigmoid(logits)</span><br><span class="line">    </span><br><span class="line">#    cost = -tf.reduce_sum(y_*tf.log(y))  #交叉熵的计算方式</span><br><span class="line">#    cost = tf.reduce_sum(tf.square(y_-y))</span><br><span class="line">    cost = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_, logits=logits)  #用sigmoid_*计算交叉熵的话，logits也可以传y</span><br><span class="line">    train_step = tf.train.GradientDescentOptimizer(0.01).minimize(cost)</span><br><span class="line">    print &apos;initial&apos;</span><br><span class="line">    init = tf.initialize_all_variables()</span><br><span class="line">    print &apos;session&apos;</span><br><span class="line">    sess = tf.Session()</span><br><span class="line">    sess.run(init)</span><br><span class="line"> </span><br><span class="line">    #多标签分类计算准确率</span><br><span class="line">    correct_tags = tf.equal(tf.cast(tf.greater_equal(tf.sigmoid(logits), 0.5), tf.int32), tf.cast(y_, tf.int32))</span><br><span class="line">    accuracy = tf.reduce_mean(tf.reduce_min(tf.cast(correct_tags, tf.float32), 1))</span><br><span class="line"> </span><br><span class="line">    #比较预测和真实分类值</span><br><span class="line">#    correct_prediction = tf.equal(y__cast, y_cast)</span><br><span class="line">#    correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1)) #argmax是指取数组中最大的值所在的索引</span><br><span class="line">#    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))</span><br><span class="line">    print &apos;accuracy&apos;</span><br><span class="line">    </span><br><span class="line">    for epoch in range(num_epochs):</span><br><span class="line">        print(&apos;epoch:&apos;, epoch+1)</span><br><span class="line">        batch_train = batch_iter(x_train, y_train, batch_size)</span><br><span class="line">             </span><br><span class="line">        #这里x_batch的维度是(batch_size, seq_length), batch_size其实就是每次取的文档的个数</span><br><span class="line">        for x_batch, y_batch in batch_train:</span><br><span class="line">#            pdb.set_trace() </span><br><span class="line">            feed_dict = feed_data(x_batch, y_batch)</span><br><span class="line">            sess.run(train_step, feed_dict=feed_dict)</span><br><span class="line">    </span><br><span class="line">            print &apos;accuracy&apos;,sess.run(accuracy, feed_dict=feed_dict)</span><br><span class="line">            print &apos;y&apos;,sess.run(tf.cast(tf.greater_equal(tf.sigmoid(logits), 0.5), tf.int32), feed_dict=feed_dict)</span><br><span class="line">            print &apos;y_&apos;,sess.run(tf.cast(y_, tf.int32), feed_dict=feed_dict)   </span><br><span class="line"> </span><br><span class="line">feed_dict = feed_data(x_train, y_train)</span><br><span class="line">print &apos;accuracy&apos;,sess.run(accuracy, feed_dict=feed_dict)</span><br></pre></td></tr></table></figure></p>
+<p>代码相对于softmax做分类有几个区别：</p>
+<p>1、softmax是将样本输出转换成one-hot向量，而sigmoid做多标签分类，则不是one-hot，而是有多位为1</p>
+<p>2、计算accuracy准确率上，有些差别，sigmoid做多标签分类计算准确率有些复杂</p>
+<p>如果想提高准确率，可以尝试采用cnn或者lstm/rnn模型，最后接一层sigmoid来做多标签分类</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/03/用Docker容器自带的tensorflow-serving部署模型对外服务（成功率100-）/" rel="next" title="用Docker容器自带的tensorflow serving部署模型对外服务（成功率100%）">
+                <i class="fa fa-chevron-left"></i> 用Docker容器自带的tensorflow serving部署模型对外服务（成功率100%）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/30/如何用softmax和sigmoid来做多类分类和多标签分类/" rel="prev" title="如何用softmax和sigmoid来做多类分类和多标签分类">
+                如何用softmax和sigmoid来做多类分类和多标签分类 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">jasonjie</p>
+              <p class="site-description motion-element" itemprop="description">生活不只眼前的苟且，还有诗和远方的田野</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">40</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jasonjie</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

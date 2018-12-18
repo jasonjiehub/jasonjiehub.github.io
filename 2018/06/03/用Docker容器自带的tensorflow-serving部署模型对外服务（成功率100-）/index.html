@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Python,机器学习,后端服务,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前传： 相信很多人和我一样，在试图安装tensorflow serving的时候，翻遍了网上的博客和官网文档，安装都是以失败而告终，我也是一样，这个问题折磨了我两个星期之久，都快放弃了。幸运的是在同事的建议下，我采用了一种迂回的策略安装成功了。 我们采用的策略是： pull一个已经安装好了tensorflow serving的docker镜像，替换它自带的一些模型为我们自己的模型。 步骤： 1、拉">
+<meta name="keywords" content="Python,机器学习,后端服务">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用Docker容器自带的tensorflow serving部署模型对外服务（成功率100%）">
+<meta property="og:url" content="http://www.denglinjie.com/2018/06/03/用Docker容器自带的tensorflow-serving部署模型对外服务（成功率100-）/index.html">
+<meta property="og:site_name" content="jasonjie">
+<meta property="og:description" content="前传： 相信很多人和我一样，在试图安装tensorflow serving的时候，翻遍了网上的博客和官网文档，安装都是以失败而告终，我也是一样，这个问题折磨了我两个星期之久，都快放弃了。幸运的是在同事的建议下，我采用了一种迂回的策略安装成功了。 我们采用的策略是： pull一个已经安装好了tensorflow serving的docker镜像，替换它自带的一些模型为我们自己的模型。 步骤： 1、拉">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://www.denglinjie.com/upload_image/5.png">
+<meta property="og:updated_time" content="2018-12-18T11:57:36.034Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="用Docker容器自带的tensorflow serving部署模型对外服务（成功率100%）">
+<meta name="twitter:description" content="前传： 相信很多人和我一样，在试图安装tensorflow serving的时候，翻遍了网上的博客和官网文档，安装都是以失败而告终，我也是一样，这个问题折磨了我两个星期之久，都快放弃了。幸运的是在同事的建议下，我采用了一种迂回的策略安装成功了。 我们采用的策略是： pull一个已经安装好了tensorflow serving的docker镜像，替换它自带的一些模型为我们自己的模型。 步骤： 1、拉">
+<meta name="twitter:image" content="http://www.denglinjie.com/upload_image/5.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.denglinjie.com/2018/06/03/用Docker容器自带的tensorflow-serving部署模型对外服务（成功率100-）/">
+
+
+
+
+
+  <title>用Docker容器自带的tensorflow serving部署模型对外服务（成功率100%） | jasonjie</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">jasonjie</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2018/06/03/用Docker容器自带的tensorflow-serving部署模型对外服务（成功率100-）/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="jasonjie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jasonjie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">用Docker容器自带的tensorflow serving部署模型对外服务（成功率100%）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-03T19:51:26+08:00">
+                2018-06-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>前传：</p>
+<p>相信很多人和我一样，在试图安装tensorflow serving的时候，翻遍了网上的博客和官网文档，安装都是以失败而告终，我也是一样，这个问题折磨了我两个星期之久，都快放弃了。幸运的是在同事的建议下，我采用了一种迂回的策略安装成功了。</p>
+<p>我们采用的策略是：</p>
+<pre><code>pull一个已经安装好了tensorflow serving的docker镜像，替换它自带的一些模型为我们自己的模型。
+</code></pre><p>步骤：</p>
+<p>1、拉取带tensorflow serving的docker镜像，这样我们服务器上就有了一个安装了ModelServer的docker容器, 这个容器就可以看做一台虚拟机，这个虚拟机上已经安装好了tensorflow serving，环境有了，就可以用它来部署我们的模型了。注意这个拉取下来后不是直接放在当前目录的，而是docker默认存储的路径，这个是个docker容器，和第2步clone下来的不是同一个东西<br><a id="more"></a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$docker pull tensorflow/serving</span><br></pre></td></tr></table></figure></p>
+<p>2、获取例子模型：（当然，也可以直接用上面容器中自带的例子），当然这里是直接拉取了tensorflow serving的源码，源码中有一些训练好的例子模型<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$cd /root/software/</span><br><span class="line">$git clone https://github.com/tensorflow/serving</span><br></pre></td></tr></table></figure></p>
+<p>3、用第一步拉取的docker容器运行例子模型</p>
+<p>第2步中clone下来的serving源码中有这样一个训练好的例子模型，路径为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/root/software/serving/tensorflow_serving/servables/tensorflow/testdata/saved_model_half_plus_two_cpu</span><br></pre></td></tr></table></figure></p>
+<p>现在我们就要用第1步拉下来的docker容器来运行部署这个例子模型<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$docker run -p 8501:8501 \</span><br><span class="line">  --mount type=bind,\</span><br><span class="line">  source=/root/software/serving/tensorflow_serving/servables/tensorflow/testdata/saved_model_half_plus_two_cpu,\</span><br><span class="line">  target=/models/half_plus_two \</span><br><span class="line">  -e MODEL_NAME=half_plus_two -t tensorflow/serving &amp;</span><br></pre></td></tr></table></figure></p>
+<p>参数说明：<br>–mount：   表示要进行挂载<br>source：    指定要运行部署的模型地址， 也就是挂载的源，这个是在宿主机上的模型目录<br>target:     这个是要挂载的目标位置，也就是挂载到docker容器中的哪个位置，这是docker容器中的目录<br>-t:         指定的是挂载到哪个容器<br>-p:         指定主机到docker容器的端口映射<br>docker run: 启动这个容器并启动模型服务（这里是如何同时启动容器中的模型服务的还不太清楚）</p>
+<p>综合解释：<br>         将source目录中的例子模型，挂载到-t指定的docker容器中的target目录，并启动<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">这步注意，如果执行报错无法识别type=bind， 那应该是source的路径有问题</span><br><span class="line"></span><br><span class="line">4、调用这个服务，这里用的http接口</span><br></pre></td></tr></table></figure></p>
+<p>$curl -d ‘{“instances”: [1.0, 2.0, 5.0]}’ \<br>  -X POST <a href="http://localhost:8501/v1/models/half_plus_two:predict" target="_blank" rel="noopener">http://localhost:8501/v1/models/half_plus_two:predict</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">得到的结果如下：</span><br></pre></td></tr></table></figure></p>
+<p>{ “predictions”: [2.5, 3.0, 4.5] }<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">这就表明服务已经部署成功了，当然你也可以用requests来模型上述http请求</span><br><span class="line"></span><br><span class="line">5、查看启动的这个模型的目录的结构</span><br><span class="line"></span><br><span class="line">我们可以看到启动服务的命令有一个参数：</span><br></pre></td></tr></table></figure></p>
+<p>source=/root/software/serving/tensorflow_serving/servables/tensorflow/testdata/saved_model_half_plus_two_cpu<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">这实际就是模型的位置， 我们进入到这个目录下（这个目录基于自己pull时所在的目录），可以看到里面是一个名为00000123的目录，这实际是模型的版本，再进入到这个目录下可以看到一个如下两个文件：</span><br></pre></td></tr></table></figure></p>
+<p>saved_model.pb, variables<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">variable目录下有如下两个文件：</span><br></pre></td></tr></table></figure></p>
+<p>variables.data-00000-of-00001, variables.index<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">6、用自己的模型替换上述half_plus_two模型</span><br><span class="line"></span><br><span class="line">我在和saved_model_half_plus_two_cpu模型同级的目录下创建了一个文件夹，名为textcnnrnn， 这是我模型的名称，然后</span><br></pre></td></tr></table></figure></p>
+<p>$cd textcnnrnn<br>$mkdir 00000123<br>$cd 00000123<br>$mkdir variables<br>$cd variables<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">我一开始是直接用的我之前训练好的模型放到了variables目录下，我训练好的模型包含如下几个文件：</span><br></pre></td></tr></table></figure></p>
+<p>best_validation.data-00000-of-00001  best_validation.index  best_validation.meta  checkpoint<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">相信大家都看出来了，这个是用这种方式保存的：</span><br></pre></td></tr></table></figure></p>
+<p>saver = tf.train.Saver()<br>saver.save(sess=session, save_path=save_path)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">于是我激动的去重新启动我的模型，当然这里要修改模型的地址，我也把我的模型的名字改了下：</span><br></pre></td></tr></table></figure></p>
+<p>docker run -p 8501:8501 –mount source=/root/software/serving/tensorflow_serving/servables/tensorflow/testdata/textcnnrnn,type=bind,target=/models/find_lemma_category -e MODEL_NAME=find_lemma_category -t tensorflow/serving &amp;<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">可是这个时候报错了，做法不对。下面是正确的做法。</span><br><span class="line"></span><br><span class="line">其实仔细比较我的模型的几个文件和half_plus_two模型的下的文件的结构根本不一样，怎么办呢？ 其实应该对模型的格式进行转换。 代码如下：</span><br></pre></td></tr></table></figure></p>
+<h1 id="coding-utf-8"><a href="#coding-utf-8" class="headerlink" title="coding: utf-8"></a>coding: utf-8</h1><p>from <strong>future</strong> import print_function<br>import pdb<br>import time<br>import os<br>import tensorflow as tf<br>import tensorflow.contrib.keras as kr</p>
+<p>from cnn_rnn_model import TCNNRNNConfig, TextCNNRNN</p>
+<p>save_path = ‘model_saver/textcnnrnn/best_validation’<br>try:<br>    bool(type(unicode))<br>except NameError:<br>    unicode = str</p>
+<p>config = TCNNRNNConfig()</p>
+<p>def build_and_saved_wdl():</p>
+<pre><code>model = TextCNNRNN(config) #我自己的模型结构是在这个类中定义的，基于自己的模型进行替换
+
+session = tf.Session()
+session.run(tf.global_variables_initializer())
+saver = tf.train.Saver()
+saver.restore(sess=session, save_path=save_path)
+</code></pre><h1 id="将训练好的模型保存在model-name下，版本为2，当然你的版本可以随便写"><a href="#将训练好的模型保存在model-name下，版本为2，当然你的版本可以随便写" class="headerlink" title="将训练好的模型保存在model_name下，版本为2，当然你的版本可以随便写"></a>将训练好的模型保存在model_name下，版本为2，当然你的版本可以随便写</h1><pre><code>builder = tf.saved_model.builder.SavedModelBuilder(&quot;./model_name/2&quot;)
+inputs = {
+    #注意，这里是你预测模型的时候需要传的参数，调用模型的时候，传参必须和这里一致
+    #这里的model.input_x和model.keep_prob就是模型里面定义的输入placeholder    
+    &quot;input_x&quot;: tf.saved_model.utils.build_tensor_info(model.input_x),
+    &quot;keep_prob&quot;: tf.saved_model.utils.build_tensor_info(model.keep_prob)
+}
+
+#model.y_pred_cls是模型的输出， 预测的时候就是计算这个表达式
+output = {&quot;output&quot;: tf.saved_model.utils.build_tensor_info(model.y_pred_cls)}
+prediction_signature = tf.saved_model.signature_def_utils.build_signature_def(
+    inputs=inputs,
+    outputs=output,
+    method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME
+)
+
+builder.add_meta_graph_and_variables(
+    session,
+    [tf.saved_model.tag_constants.SERVING],
+    {tf.saved_model.signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY: prediction_signature}
+)
+builder.save()
+</code></pre><p>if <strong>name</strong> == ‘<strong>main</strong>‘:<br>    build_and_saved_wdl()<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">执行后，会在当前目录下生成一个名称为./model_name/2的文件夹， 这个文件夹下的文件格式和halt_plus_two中的文件格式是一致的了，这下肯定没错了。</span><br><span class="line"></span><br><span class="line">将./model_name/2文件夹下的内容拷贝到textcnnrnn/00000123目录下即可。</span><br><span class="line"></span><br><span class="line">重新启动模型，这次启动成功了，没有报错，说明我们的模型已经被识别成功。</span><br><span class="line"></span><br><span class="line">7、调用模型</span><br><span class="line"></span><br><span class="line">咋调啊？咋传参数啊？懵逼，先看看调用自带的模型怎么传参数的吧：</span><br></pre></td></tr></table></figure></p>
+<p>curl -d ‘{“instances”: [1.0, 2.0, 5.0]}’ \<br>  -X POST <a href="http://localhost:8501/v1/models/half_plus_two:predict" target="_blank" rel="noopener">http://localhost:8501/v1/models/half_plus_two:predict</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">看样子instances应该是参数的名字，于是我想看看tensorflow serving源码里面是怎么解析这个参数的，所以我在源码根目录下全局搜索了这个关键字，在根目录下搜索关键词instances：</span><br></pre></td></tr></table></figure></p>
+<p>$find . -name ‘<em>.</em>‘ | xargs grep -l instances<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">可以找到一个名为json_tensor.h的文件，这个文件详细介绍了不同的传参的方式：</span><br></pre></td></tr></table></figure></p>
+<p><img src="/upload_image/5.png" alt=""><br>instances是一个list，list中每个元素是一个待预测实例，每个实例里面是所有参数的值， 所以参数按照这种方式构造就可以了。</p>
+<p>这里json.dumps的时候可能会遇到一个序列化的错误，原因是json.dumps对于含numpy.array类型的数据无法序列化， 可以构造一个编码器， 然后作为json.dumps参数：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">class NumpyEncoder(json.JSONEncoder):</span><br><span class="line">    def default(self, obj):</span><br><span class="line">        if isinstance(obj, np.ndarray):</span><br><span class="line">            return obj.tolist()</span><br><span class="line">        return json.JSONEncoder.default(self, obj)</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">p_data = &#123;&quot;keep_prob&quot;: 1.0, &quot;input_x&quot;: x_test[0]&#125;</span><br><span class="line">param = &#123;&quot;instances&quot;: [p_data]&#125;</span><br><span class="line">param = json.dumps(param, cls=NumpyEncoder)</span><br><span class="line">res = requests.post(&apos;http://localhost:8501/v1/models/find_lemma_category:predict&apos;, data=param)</span><br></pre></td></tr></table></figure>
+<p>这样就大功告成了！</p>
+<p>这里还有一个地方需要注意：其实我的模型Input_x本身是直接可以接收多个实例的，也就是上面我的参数x_test是多个实例构造的参数，但是直接传入会出错，所以我只能传入一个实例x_test[0]。 如果想同时预测多个的话只能这样构造参数：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">data1 = &#123;&quot;keep_prob&quot;: 1.0, &quot;input_x&quot;: x_test[0]&#125;</span><br><span class="line">data2 = &#123;&quot;keep_prob&quot;: 1.0, &quot;input_x&quot;: x_test[1]&#125;</span><br><span class="line">data3 = &#123;&quot;keep_prob&quot;: 1.0, &quot;input_x&quot;: x_test[2]&#125;</span><br><span class="line">param = &#123;&quot;instances&quot;: [data1, data2, data3]&#125;</span><br><span class="line">param = json.dumps(param, cls=NumpyEncoder)</span><br><span class="line">res = requests.post(&apos;http://localhost:8501/v1/models/find_lemma_category:predict&apos;, data=param)</span><br></pre></td></tr></table></figure></p>
+<p>8、参数要预处理怎么办？</p>
+<p>假如我们需要在将参数输入模型之前做一些预处理怎么办？比如要对大段文本进行分词等等。</p>
+<p>解决办法： 部署一个中转服务，我采用的策略是用tornado再部署一个服务，这个服务负责对业务方传输过来的参数进行预处理，处理成模型需要的格式后，再传输给模型， 所以我的结构是这样的：</p>
+<p>业务方 ==&gt;  tornado服务（参数预处理） ==&gt; 模型(tensorflow serving服务)</p>
+<p>这里面的两次远程调用都是http协议。</p>
+<p>参考地址：</p>
+<pre><code>https://www.tensorflow.org/serving/docker
+
+https://www.jianshu.com/p/2fffd0e332bc
+</code></pre>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+            <a href="/tags/后端服务/" rel="tag"># 后端服务</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/05/ab测试post如何用文件提交json格式的参数/" rel="next" title="ab测试post如何用文件提交json格式的参数">
+                <i class="fa fa-chevron-left"></i> ab测试post如何用文件提交json格式的参数
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/06/基于sigmoid的文本多标签分类模型代码实现/" rel="prev" title="基于sigmoid的文本多标签分类模型代码实现">
+                基于sigmoid的文本多标签分类模型代码实现 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">jasonjie</p>
+              <p class="site-description motion-element" itemprop="description">生活不只眼前的苟且，还有诗和远方的田野</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">40</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#coding-utf-8"><span class="nav-number">1.</span> <span class="nav-text">coding: utf-8</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#将训练好的模型保存在model-name下，版本为2，当然你的版本可以随便写"><span class="nav-number">2.</span> <span class="nav-text">将训练好的模型保存在model_name下，版本为2，当然你的版本可以随便写</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jasonjie</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

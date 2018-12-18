@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="机器学习,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Word2vec中两个重要模型是：CBOW和Skip-gram模型 首先Wordvec的目标是：将一个词表示成一个向量 这里首先说下我对CBOW模型的理解 这是主要是举个例子简化下 首先说下CBOW的三层结构：输入层，投影层（中间层），输出层 假设语料库有10个词: 【今天，我，你，他，小明，玩，北京，去，和，好】 现在有这样一句话：今天我和小明去北京玩 很显然，对这个句子分词后应该是：">
+<meta name="keywords" content="机器学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Word2vec之CBOW模型和Skip-gram模型形象解释">
+<meta property="og:url" content="http://www.denglinjie.com/2018/10/18/Word2vec之CBOW模型和Skip-gram模型形象解释/index.html">
+<meta property="og:site_name" content="jasonjie">
+<meta property="og:description" content="Word2vec中两个重要模型是：CBOW和Skip-gram模型 首先Wordvec的目标是：将一个词表示成一个向量 这里首先说下我对CBOW模型的理解 这是主要是举个例子简化下 首先说下CBOW的三层结构：输入层，投影层（中间层），输出层 假设语料库有10个词: 【今天，我，你，他，小明，玩，北京，去，和，好】 现在有这样一句话：今天我和小明去北京玩 很显然，对这个句子分词后应该是：">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://www.denglinjie.com/upload_image/7.png">
+<meta property="og:updated_time" content="2018-12-18T12:15:52.503Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Word2vec之CBOW模型和Skip-gram模型形象解释">
+<meta name="twitter:description" content="Word2vec中两个重要模型是：CBOW和Skip-gram模型 首先Wordvec的目标是：将一个词表示成一个向量 这里首先说下我对CBOW模型的理解 这是主要是举个例子简化下 首先说下CBOW的三层结构：输入层，投影层（中间层），输出层 假设语料库有10个词: 【今天，我，你，他，小明，玩，北京，去，和，好】 现在有这样一句话：今天我和小明去北京玩 很显然，对这个句子分词后应该是：">
+<meta name="twitter:image" content="http://www.denglinjie.com/upload_image/7.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.denglinjie.com/2018/10/18/Word2vec之CBOW模型和Skip-gram模型形象解释/">
+
+
+
+
+
+  <title>Word2vec之CBOW模型和Skip-gram模型形象解释 | jasonjie</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">jasonjie</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2018/10/18/Word2vec之CBOW模型和Skip-gram模型形象解释/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="jasonjie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jasonjie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Word2vec之CBOW模型和Skip-gram模型形象解释</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-18T20:12:44+08:00">
+                2018-10-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Word2vec中两个重要模型是：CBOW和Skip-gram模型</p>
+<p>首先Wordvec的目标是：将一个词表示成一个向量</p>
+<p>这里首先说下我对CBOW模型的理解</p>
+<p>这是主要是举个例子简化下</p>
+<p>首先说下CBOW的三层结构：输入层，投影层（中间层），输出层</p>
+<p>假设语料库有10个词: 【今天，我，你，他，小明，玩，北京，去，和，好】</p>
+<p>现在有这样一句话：今天我和小明去北京玩</p>
+<p>很显然，对这个句子分词后应该是：<br><a id="more"></a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">今天  我  和  小明  去  北京  玩</span><br></pre></td></tr></table></figure></p>
+<p>对于小明而言，选择他的前三个词和后三个词作为这个词的上下文</p>
+<p>接下来，将这些分别全部表示成一个one-hot向量(向量中只有一个元素值为1，其他都是0)</p>
+<p>则向量如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">今天：[1, 0, 0, 0, 0, 0, 0, 0, 0, 0]  记为x1</span><br><span class="line">我  ：[0, 1, 0, 0, 0, 0, 0, 0, 0, 0]  记为x2</span><br><span class="line">和  ：[0, 0, 0, 0, 0, 0, 0, 0, 1, 0]  记为x3</span><br><span class="line">去  ：[0, 0, 0, 0, 0, 0, 0, 1, 0, 0]  记为x4</span><br><span class="line">北京：[0, 0, 0, 0, 0, 0, 1, 0, 0, 0]  记为x5</span><br><span class="line">玩  ：[0, 0, 0, 0, 0, 0, 1, 0, 0, 0]  记为x6</span><br></pre></td></tr></table></figure></p>
+<p>此外，小明的向量表示如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">小明  ：[0, 0, 0, 0, 1, 0, 0, 0, 0, 0]</span><br></pre></td></tr></table></figure></p>
+<p>可以看出来，向量的维度就是语料库中词的个数</p>
+<p>接下来，将这6个向量求和，作为神经网络模型的输入，即<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">X = x1 + x2 + x3 + x4 + x5 + x6 = [1, 1, 0, 0, 0, 1, 1, 1, 1, 0]</span><br></pre></td></tr></table></figure></p>
+<p>则X就是输入层，即输入层是由小明的前后三个词生成的一个向量，为1*10维（这里的10是语料库中词语的个数）</p>
+<p>我们这里是根据一个词语的上下文来预测这个词究竟是哪个，这个例子中就是根据小明这个词的前后三个词来预测小明这个位置出现各个词的概率，因为训练数据中这个词就是小明，所以小明出现的概率应该是最大的， 所以我们希望输出层的结果就是小明对应的向量</p>
+<p>所以本例中，输出层期望的数据实际就是小明这个词构成的向量(可以认为是训练数据的标签) 即：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">小明  ：[0, 0, 0, 0, 1, 0, 0, 0, 0, 0]</span><br></pre></td></tr></table></figure></p>
+<p>那么神经网络模型可以画成如下形状<br><img src="/upload_image/7.png" alt=""><br>这里我们可以随意设定投影层的维度，即m的值，则：</p>
+<p>输入层和投影层的连线就可以构成一个参数矩阵1, 即w，该矩阵的维度为10*m(这里10是语料库中词语的个数)， 可以随机初始化这个矩阵的参数值</p>
+<p>投影层和输出层的连线就可以构成一个参数矩阵2，即b， 该矩阵的维度为m*10， 可以随机初始化这个矩阵的参数值</p>
+<p>这样最终的输出层的维度1<em>10 = (1</em>10) <em> (10</em>m) <em> (m</em>10) </p>
+<p>参数矩阵1为：w</p>
+<p>参数矩阵2为：b</p>
+<p>那么模型的目标函数是什么呢？</p>
+<p>就是损失函数，就是实际输出和期望输出的差值，我可以定义为平方差</p>
+<p>首先，期望输出就是“小明” 对应的向量<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Y_ = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0]</span><br></pre></td></tr></table></figure></p>
+<p>这个可以认为是训练数据的标签</p>
+<p>实际输出就是根据输入X以及两个参数矩阵w和b计算后输入到softmax函数所得的结果：</p>
+<p>即将 X <em> w </em> b的值 输入到softmax函数得到实际的输出<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Y =  [y1, y2, y3, y4, y5, y6, y7, y8, y9, y10]</span><br></pre></td></tr></table></figure></p>
+<p>则损失函数可以定义为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">J(θ) = (y1-0)*(y1-0) +  (y2-0)*(y2-0) +  (y3-0)*(y3-0) +  (y4-0)*(y4-0) +  (y5-1)*(y5-1) +  (y6-0)*(y6-0) +  (y7-0)*(y7-0) +  (y8-0)*(y8-0) +  (y9-0)*(y9-0) +  (y10-0)*(y10-0)</span><br></pre></td></tr></table></figure></p>
+<p>这里实际就是计算的两个向量的距离，当然你可以采用别的算法<br>这个损失函数是关于w和b的函数， 目标就是极小化损失函数</p>
+<p>采用梯度下降法来不断调整w和b的值(即不断给w和b的参数值一个增量)， 当模型的输出满足某个设定的条件时，则停止训练</p>
+<p>注意： 模型输出的结果不会刚好就是一个one-hot向量， 可以认为趋近于0的就是0，趋近于1的就是1，当然为1的肯定只有一个元素</p>
+<p>为了加快训练速度，可以一个批次一起训练，将多个句子的损失函数求和来训练</p>
+<p>最终训练结束后，就要将一个词表示成一个向量，那么怎么表示呢？</p>
+<p>输入X中第一个元素的值为1， 这表示的其实就是“今天” 这个词，那么“今天”就用它对应的连线上的权重参数来表示<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">今天 =  [w11, w12... w1m]</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">我   =  [w21, w22... w2m]</span><br></pre></td></tr></table></figure>
+<p>至于为什么要这样表示，至今没有人能解释<br>但是注意：这里只能将X中元素为1的词表示成向量，即只能将句子中出现的词表示成向量，即“小明”的前后三个词</p>
+<p>然后说下我对Skip-gram模型的理解</p>
+<p>其实理解了CBOW模型后，要理解Skip-gram模型就非常简单了，CBOW模型是用词的前后几个词来预测这个词，而Skip-gram模型则是用一个词来预测他周围的词。<br>图还是跟上面画的那个图是一样的，只不过输入X不是那几个词的向量和了，而是“小明” 对应的向量，即输入只有一个，输出也是只有一个，每次只预测一个词<br>Skip-gram模型最终的结果是将小明表示成一个向量，而CBOW模型是将“小明”前后三个词表示成向量</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/18/服务自动拉起，定时日志清理，数据统计的shell脚本/" rel="next" title="服务自动拉起，定时日志清理，数据统计的shell脚本">
+                <i class="fa fa-chevron-left"></i> 服务自动拉起，定时日志清理，数据统计的shell脚本
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/18/Redis慢日志问题解决/" rel="prev" title="Redis慢日志问题解决">
+                Redis慢日志问题解决 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">jasonjie</p>
+              <p class="site-description motion-element" itemprop="description">生活不只眼前的苟且，还有诗和远方的田野</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">40</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jasonjie</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Redis,Python,">
+  <meta name="keywords" content="Python,Redis,">
 
 
 
@@ -80,7 +80,7 @@
 
 
 <meta name="description" content="目前的流程： 两个Redis： Redis1： 存储词条的summary信息 Redis2：任务队列，用于暂存Redis中没有summary，需要进行处理获取summary， 队列用的Redis的list结构 两个进程： 1、 进程1：服务进程 接收请求，划内链词，然后从Redis1中去获取词的summary， 如果获取失败，则返回code=4的错误，并将词条id写入任务队列Redis2等待被进程">
-<meta name="keywords" content="Redis,Python">
+<meta name="keywords" content="Python,Redis">
 <meta property="og:type" content="article">
 <meta property="og:title" content="一次Redis任务队列积压的问题分析与解决">
 <meta property="og:url" content="http://www.denglinjie.com/2017/09/16/一次Redis任务队列积压的问题分析与解决/index.html">
@@ -402,9 +402,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Redis/" rel="tag"># Redis</a>
-          
             <a href="/tags/Python/" rel="tag"># Python</a>
+          
+            <a href="/tags/Redis/" rel="tag"># Redis</a>
           
         </div>
       
@@ -497,7 +497,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">40</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -519,7 +519,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

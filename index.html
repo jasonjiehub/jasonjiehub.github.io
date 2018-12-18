@@ -412,7 +412,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2018/01/04/二维卷积神经网络的结构理解/">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2018/10/18/Word2vec之CBOW模型和Skip-gram模型形象解释/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="jasonjie">
@@ -431,7 +431,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/01/04/二维卷积神经网络的结构理解/" itemprop="url">二维卷积神经网络的结构理解</a></h1>
+                <a class="post-title-link" href="/2018/10/18/Word2vec之CBOW模型和Skip-gram模型形象解释/" itemprop="url">Word2vec之CBOW模型和Skip-gram模型形象解释</a></h1>
         
 
         <div class="post-meta">
@@ -443,8 +443,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-04T19:22:55+08:00">
-                2018-01-04
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-18T20:12:44+08:00">
+                2018-10-18
               </time>
             
 
@@ -504,23 +504,24 @@
 
       
         
-          <p><img src="/upload_image/2.png" alt=""><br>针对这个图，我们对应着卷积的api函数来说：</p>
-<p>tf.nn.conv2d(input, filter, strides, padding, use_cudnn_on_gpu=None, name=None)</p>
-<p>如上图：</p>
-<p>第一列为一张输入图像， 大小为7<em>7</em>3， 即宽高为7*7， 通道数为3</p>
-<p>所以inputs的维度就是： [-1, 7, 7, 3] , -1是表示batch的大小可以随意，基于输入决定</p>
-<p>第二列和第三列为一个卷积层， 对应着参数filter， 它是一个4d的参数， 分别为卷积层的高，宽，图像通道数，卷积核数</p>
-<p>宽高很显然是3<em>3， 就是第二列或者第三列里面的一个红色的矩形的宽高<br>
+          <p>Word2vec中两个重要模型是：CBOW和Skip-gram模型</p>
+<p>首先Wordvec的目标是：将一个词表示成一个向量</p>
+<p>这里首先说下我对CBOW模型的理解</p>
+<p>这是主要是举个例子简化下</p>
+<p>首先说下CBOW的三层结构：输入层，投影层（中间层），输出层</p>
+<p>假设语料库有10个词: 【今天，我，你，他，小明，玩，北京，去，和，好】</p>
+<p>现在有这样一句话：今天我和小明去北京玩</p>
+<p>很显然，对这个句子分词后应该是：<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/01/04/二维卷积神经网络的结构理解/#more" rel="contents">
+            <a class="btn" href="/2018/10/18/Word2vec之CBOW模型和Skip-gram模型形象解释/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
           <!--/noindex-->
         
       
-    </em></p></div>
+    </p></div>
     
     
     
@@ -564,7 +565,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2018/01/03/tf-layers-conv1d函数解析（一维卷积）/">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2018/09/18/服务自动拉起，定时日志清理，数据统计的shell脚本/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="jasonjie">
@@ -583,7 +584,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/01/03/tf-layers-conv1d函数解析（一维卷积）/" itemprop="url">tf.layers.conv1d函数解析（一维卷积）</a></h1>
+                <a class="post-title-link" href="/2018/09/18/服务自动拉起，定时日志清理，数据统计的shell脚本/" itemprop="url">服务自动拉起，定时日志清理，数据统计的shell脚本</a></h1>
         
 
         <div class="post-meta">
@@ -595,8 +596,308 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-03T19:15:23+08:00">
-                2018-01-03
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-18T20:08:56+08:00">
+                2018-09-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <ol>
+<li>首先是自动拉起的脚本：monitorProcess.sh</li>
+</ol>
+<p>我们需要自动拉起的服务是通过配置文件来进行配置的，我们制定了自己的配置文件格式，定时任务定时读取配置文件中配置的需要拉起的服务来执行拉起<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/09/18/服务自动拉起，定时日志清理，数据统计的shell脚本/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </p></div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2018/08/28/Python如何从内存中找回源代码/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="jasonjie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jasonjie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/28/Python如何从内存中找回源代码/" itemprop="url">Python如何从内存中找回源代码</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-28T20:04:38+08:00">
+                2018-08-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>首先，项目必须在运行，代码必须驻留在内存中<br>安装GDB（pyrasite需要）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-get update &amp;&amp; apt-get install gdb</span><br></pre></td></tr></table></figure></p>
+<p>安装pyrasite，它让你能够跟正在运行的进程通信<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install pyrasite</span><br></pre></td></tr></table></figure></p>
+<p>安装uncomplyle6，它能让你获取内存中存在的对象的源代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install uncompyle6</span><br></pre></td></tr></table></figure></p>
+<p>找到正在运行的进程的PID<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps aux | grep python</span><br></pre></td></tr></table></figure></p>
+<p>使用pyrasite附着一个交互提示符<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pyrasite-shell &lt;PID&gt;</span><br></pre></td></tr></table></figure></p>
+<p>现在你在交互终端中了，导入你要恢复的代码<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/08/28/Python如何从内存中找回源代码/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </p></div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2018/07/10/基于softmax的文本多分类模型代码实现/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="jasonjie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jasonjie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/10/基于softmax的文本多分类模型代码实现/" itemprop="url">基于softmax的文本多分类模型代码实现</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-10T20:02:07+08:00">
+                2018-07-10
               </time>
             
 
@@ -656,483 +957,24 @@
 
       
         
-          <p>一维卷积一般用于处理文本，所以输入一般是一段长文本，就是词的列表</p>
-<p>函数定义如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">tf.layers.conv1d(</span><br><span class="line">inputs,</span><br><span class="line">filters,</span><br><span class="line">kernel_size,</span><br><span class="line">strides=1,</span><br><span class="line">padding=&apos;valid&apos;,</span><br><span class="line">data_format=&apos;channels_last&apos;,</span><br><span class="line">dilation_rate=1,</span><br><span class="line">activation=None,</span><br><span class="line">use_bias=True,</span><br><span class="line">kernel_initializer=None,</span><br><span class="line">bias_initializer=tf.zeros_initializer(),</span><br><span class="line">kernel_regularizer=None,</span><br><span class="line">bias_regularizer=None,</span><br><span class="line">activity_regularizer=None,</span><br><span class="line">kernel_constraint=None,</span><br><span class="line">bias_constraint=None,</span><br><span class="line">trainable=True,</span><br><span class="line">name=None,</span><br><span class="line">reuse=None</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
-<p>比较重要的几个参数是inputs, filters, kernel_size，下面分别说明<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/01/03/tf-layers-conv1d函数解析（一维卷积）/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </p></div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2017/09/16/一次Redis任务队列积压的问题分析与解决/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="jasonjie">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="jasonjie">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/09/16/一次Redis任务队列积压的问题分析与解决/" itemprop="url">一次Redis任务队列积压的问题分析与解决</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-16T19:14:03+08:00">
-                2017-09-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
           
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis/" itemprop="url" rel="index">
-                    <span itemprop="name">Redis</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>目前的流程：</p>
-<p>两个Redis：</p>
-<p>Redis1： 存储词条的summary信息</p>
-<p>Redis2：任务队列，用于暂存Redis中没有summary，需要进行处理获取summary， 队列用的Redis的list结构</p>
-<p>两个进程：</p>
-<p>1、 进程1：服务进程</p>
-<p>接收请求，划内链词，然后从Redis1中去获取词的summary， 如果获取失败，则返回code=4的错误，并将词条id写入任务队列Redis2等待被进程2处理<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/09/16/一次Redis任务队列积压的问题分析与解决/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </p></div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2017/09/08/2017-09-12-我是如何解决jobtracker.info could only be replicated to 0 nodes, instead of 1这个问题的/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="jasonjie">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="jasonjie">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/09/08/2017-09-12-我是如何解决jobtracker.info could only be replicated to 0 nodes, instead of 1这个问题的/" itemprop="url">我是如何解决jobtracker.info could only be replicated to 0 nodes, instead of 1这个问题的</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-08T00:00:00+08:00">
-                2017-09-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                  <a href="/categories/Hadoop开发/" itemprop="url" rel="index">
-                    <span itemprop="name">Hadoop开发</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>我按照慕课网上的教程来学习搭建hadoop-1.2.1环境，可是在start-all.sh这步的时候一直通不过，命令行报如下错误<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[@soguo /home/denglinjie/hadoop]# start-all.sh   </span><br><span class="line">Warning: $HADOOP_HOME is deprecated.  </span><br><span class="line">  </span><br><span class="line">starting namenode, logging to /home/denglinjie/hadoop-1.2.1/logs/hadoop-denglinjie-namenode-bjzw_30_4.out  </span><br><span class="line">localhost: ssh_exchange_identification: Connection closed by remote host  </span><br><span class="line">localhost: ssh_exchange_identification: Connection closed by remote host  </span><br><span class="line">starting jobtracker, logging to /home/denglinjie/hadoop-1.2.1/logs/hadoop-denglinjie-jobtracker-bjzw_30_4.out  </span><br><span class="line">localhost: ssh_exchange_identification: Connection closed by remote host</span><br></pre></td></tr></table></figure></p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/09/08/2017-09-12-我是如何解决jobtracker.info could only be replicated to 0 nodes, instead of 1这个问题的/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2017/06/15/两台机器实现QPS3000的服务优化/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="jasonjie">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="jasonjie">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/15/两台机器实现QPS3000的服务优化/" itemprop="url">两台机器实现QPS3000的服务优化</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-15T19:09:37+08:00">
-                2017-06-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                  <a href="/categories/Python/" itemprop="url" rel="index">
-                    <span itemprop="name">Python</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>服务流程：</p>
-<pre><code>输入为一句话， 分词、匹配百科词条，读redis过滤、从redis读词条summary信息、返回
-</code></pre><p>需求：</p>
-<pre><code>业务方的峰值QPS为3000
-</code></pre><p>按照之前相关百科的一套逻辑： 单机tornado服务进程数4个</p>
-<p>模拟10个并发，压测的QPS为332， 响应时间为30ms</p>
-<p>$siege -c10 -r5000 -f urls.lst<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Transactions:               10000 hits</span><br><span class="line">Availability:              100.00 %</span><br><span class="line">Elapsed time:               30.05 secs</span><br><span class="line">Data transferred:            3.31 MB</span><br><span class="line">Response time:                0.03 secs</span><br><span class="line">Transaction rate:          332.78 trans/sec</span><br><span class="line">Throughput:                0.11 MB/sec</span><br><span class="line">Concurrency:                9.75</span><br><span class="line">Successful transactions:       10000</span><br><span class="line">Failed transactions:               0</span><br><span class="line">Longest transaction:            0.65</span><br><span class="line">Shortest transaction:            0.00</span><br></pre></td></tr></table></figure></p>
-<p>模拟20个并发</p>
-<p>$siege -c20 -r5000 -f urls.lst<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Transactions:               20000 hits</span><br><span class="line">Availability:              100.00 %</span><br><span class="line">Elapsed time:               58.39 secs</span><br><span class="line">Data transferred:            6.72 MB</span><br><span class="line">Response time:                0.06 secs</span><br><span class="line">Transaction rate:          342.52 trans/sec</span><br><span class="line">Throughput:                0.12 MB/sec</span><br><span class="line">Concurrency:               19.77</span><br><span class="line">Successful transactions:       20000</span><br><span class="line">Failed transactions:               0</span><br><span class="line">Longest transaction:            0.41</span><br><span class="line">Shortest transaction:            0.00</span><br></pre></td></tr></table></figure></p>
-<p>压测的QPS跟刚才几乎差不多，但是响应时间已经上升到了60ms，可见，此时服务已经处理不过来了，大量的请求是处理等待状态的， 然而20个并发在业务方来说应该还算少的</p>
-<p>优化策略：</p>
-<p>第一步：  </p>
-<p>先增加服务进程数， 将单机的服务进程从4提高到10  </p>
-<p>压测：</p>
-<p>$siege -c20 -r5000 -f urls.lst</p>
-<p>QPS为700， 此时的response time是30ms<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Transactions:               20000 hits</span><br><span class="line">Availability:              100.00 %</span><br><span class="line">Elapsed time:               28.26 secs</span><br><span class="line">Data transferred:            6.72 MB</span><br><span class="line">Response time:                0.03 secs</span><br><span class="line">Transaction rate:          707.71 trans/sec</span><br><span class="line">Throughput:                0.24 MB/sec</span><br><span class="line">Concurrency:               19.47</span><br><span class="line">Successful transactions:       20000</span><br><span class="line">Failed transactions:               0</span><br><span class="line">Longest transaction:            0.35</span><br><span class="line">Shortest transaction:            0.00</span><br></pre></td></tr></table></figure></p>
-<p>第二步： </p>
-<p>减少词表的数量</p>
-<p>词表是百科所有词条的title和词条id的映射关系， 总量为2300w，因为这个需求只要求PV大于75000的才返回结果，所以词表也按照这个条件进行过滤， 过滤后，词表只剩下了13w</p>
-<p>再次压测：</p>
-<p>$siege -c20 -r5000 -f urls.lst</p>
-<p>可以看到QPS提高到了1081， response time降低到了20ms<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Transactions:               20000 hits</span><br><span class="line">Availability:              100.00 %</span><br><span class="line">Elapsed time:               18.50 secs</span><br><span class="line">Data transferred:            5.84 MB</span><br><span class="line">Response time:                0.02 secs</span><br><span class="line">Transaction rate:         1081.08 trans/sec</span><br><span class="line">Throughput:                0.32 MB/sec</span><br><span class="line">Concurrency:               19.67</span><br><span class="line">Successful transactions:       20000</span><br><span class="line">Failed transactions:               0</span><br><span class="line">Longest transaction:            0.09</span><br><span class="line">Shortest transaction:            0.00</span><br></pre></td></tr></table></figure></p>
-<p>第三步：</p>
-<p>对query做缓存</p>
-<p>因为query都是短文本，根据业务方的反馈，会存在大量的重复的query， 所以对query做缓存肯定会起到效果</p>
-<p>具体策略：</p>
-<pre><code>对query分词，分词后拼接，并计算md5值作为缓存的key， query对应的返回结果作为value缓存到redis中
-
-因为有缓存，所以这个压测不太好测，而且我们暂时也没有线上真实的数据，所以这里无法给出压测的结果，但是效果应该会很好
-</code></pre><p>目前可以大概预估下， 加了缓存后，单机的QPS应该能到1500， 那么部署两台机器就可以满足需求了</p>
+            <p>对于多分类问题，可以使用softmax来做，但是效果不是那么好，当做一个算法的练手吧</p>
+<p>首先是数据集处理的代码：</p>
+<p>文件名：data_loader.py<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br></pre></td><td class="code"><pre><span class="line"># coding: utf-8</span><br><span class="line"> </span><br><span class="line">import sys</span><br><span class="line">from collections import Counter</span><br><span class="line">import pdb</span><br><span class="line">import numpy as np</span><br><span class="line">import tensorflow.contrib.keras as kr</span><br><span class="line"> </span><br><span class="line">if sys.version_info[0] &gt; 2:</span><br><span class="line">    is_py3 = True</span><br><span class="line">else:</span><br><span class="line">    reload(sys)</span><br><span class="line">    sys.setdefaultencoding(&quot;utf-8&quot;)</span><br><span class="line">    is_py3 = False</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">def native_word(word, encoding=&apos;utf-8&apos;):</span><br><span class="line">    &quot;&quot;&quot;如果在python2下面使用python3训练的模型，可考虑调用此函数转化一下字符编码&quot;&quot;&quot;</span><br><span class="line">    if not is_py3:</span><br><span class="line">        return word.encode(encoding)</span><br><span class="line">    else:</span><br><span class="line">        return word</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">def native_content(content):</span><br><span class="line">    if not is_py3:</span><br><span class="line">        return content.decode(&apos;utf-8&apos;)</span><br><span class="line">    else:</span><br><span class="line">        return content</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">def open_file(filename, mode=&apos;r&apos;):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    常用文件操作，可在python2和python3间切换.</span><br><span class="line">    mode: &apos;r&apos; or &apos;w&apos; for read or write</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    if is_py3:</span><br><span class="line">        return open(filename, mode, encoding=&apos;utf-8&apos;, errors=&apos;ignore&apos;)</span><br><span class="line">    else:</span><br><span class="line">        return open(filename, mode)</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">def read_file(filename):</span><br><span class="line">    &quot;&quot;&quot;读取文件数据&quot;&quot;&quot;</span><br><span class="line">    contents, labels = [], []</span><br><span class="line">    with open_file(filename) as f:</span><br><span class="line">        for line in f:</span><br><span class="line">            try:</span><br><span class="line">                label, content = line.strip().split(&apos;\t&apos;)</span><br><span class="line">                if content:</span><br><span class="line">                    contents.append(list(native_content(content)))</span><br><span class="line">                    labels.append(native_content(label))</span><br><span class="line">            except:</span><br><span class="line">                pass</span><br><span class="line">    return contents, labels</span><br><span class="line"> </span><br><span class="line">#构建词汇表，使用字符级的表示，这一函数会将词汇表存储下来，避免每一次重复处理;</span><br><span class="line">def build_vocab(train_dir, vocab_dir, vocab_size=5000):</span><br><span class="line">    &quot;&quot;&quot;根据训练集构建词汇表，存储&quot;&quot;&quot;</span><br><span class="line">    #train, test, val文件的格式为： 分类 文字</span><br><span class="line">    data_train, _ = read_file(train_dir)</span><br><span class="line"> </span><br><span class="line">    all_data = []</span><br><span class="line">    for content in data_train:</span><br><span class="line">        all_data.extend(content)</span><br><span class="line"> </span><br><span class="line">    counter = Counter(all_data) #统计所有文档中每个字出现的次数 格式：&#123;&apos;c&apos;: 3, &apos;a&apos;: 1, &apos;b&apos;: 1&#125; </span><br><span class="line">    count_pairs = counter.most_common(vocab_size - 1) #取出现次数最多的部分, 格式：[(&apos;c&apos;, 3), (&apos;a&apos;, 1)]</span><br><span class="line">    words, _ = list(zip(*count_pairs)) #格式：[(&apos;c&apos;, &apos;a&apos;), (3, 1)], words格式为：(&apos;c&apos;, &apos;a&apos;)</span><br><span class="line">    # 添加一个 &lt;PAD&gt; 来将所有文本pad为同一长度</span><br><span class="line">    words = [&apos;&lt;PAD&gt;&apos;] + list(words)</span><br><span class="line">    open_file(vocab_dir, mode=&apos;w&apos;).write(&apos;\n&apos;.join(words) + &apos;\n&apos;)  #vocab_dir里面就是处理后的词表，每行一个字</span><br><span class="line"> </span><br><span class="line">#读取上一步存储的词汇表，转换为&#123;词：id&#125;表示;</span><br><span class="line">def read_vocab(vocab_dir):</span><br><span class="line">    &quot;&quot;&quot;读取词汇表&quot;&quot;&quot;</span><br><span class="line">    # words = open_file(vocab_dir).read().strip().split(&apos;\n&apos;)</span><br><span class="line">    with open_file(vocab_dir) as fp:</span><br><span class="line">        # 如果是py2 则每个值都转化为unicode</span><br><span class="line">        words = [native_content(_.strip()) for _ in fp.readlines()]</span><br><span class="line">    word_to_id = dict(zip(words, range(len(words))))</span><br><span class="line">    return words, word_to_id</span><br><span class="line"> </span><br><span class="line"># 将分类目录固定，转换为&#123;类别: id&#125;表示;</span><br><span class="line">def read_category(file):</span><br><span class="line">    categories = [] </span><br><span class="line">    for line in open(file, &apos;r&apos;):</span><br><span class="line">        categories.append(line.strip().split(&apos;\t&apos;)[0])</span><br><span class="line">    categories = set(categories)    </span><br><span class="line">    categories = [native_content(x) for x in categories]</span><br><span class="line"> </span><br><span class="line">    cat_to_id = dict(zip(categories, range(len(categories))))</span><br><span class="line"> </span><br><span class="line">    return categories, cat_to_id</span><br><span class="line"> </span><br><span class="line">#将一条由id表示的数据重新转换为文字;</span><br><span class="line">def to_words(content, words):</span><br><span class="line">    &quot;&quot;&quot;将id表示的内容转换为文字&quot;&quot;&quot;</span><br><span class="line">    return &apos;&apos;.join(words[x] for x in content)</span><br><span class="line"> </span><br><span class="line">#将数据集从文字转换为固定长度的id序列表示;</span><br><span class="line">def process_file(filename, word_to_id, cat_to_id, max_length=600):</span><br><span class="line">    &quot;&quot;&quot;将文件转换为id表示&quot;&quot;&quot;</span><br><span class="line">    contents, labels = read_file(filename)</span><br><span class="line"> </span><br><span class="line">    data_id, label_id = [], [] </span><br><span class="line">    for i in range(len(contents)):</span><br><span class="line">        #实际就是将一篇文档的词id向量和一个分类id对应起来</span><br><span class="line"> </span><br><span class="line">        #data_id中每个元素是一篇文档的词id构成的向量</span><br><span class="line">        data_id.append([word_to_id[x] for x in contents[i] if x in word_to_id])</span><br><span class="line"> </span><br><span class="line">        #label_id， 每篇文档对应一个分类id，这个分类id是与一篇文档的词id向量对应</span><br><span class="line">        label_id.append(cat_to_id[labels[i]]) </span><br><span class="line"> </span><br><span class="line">    # 使用keras提供的pad_sequences来将文本pad为固定长度</span><br><span class="line">    #因为data_id中每个元素都是一个由一篇文档中的字组成的向量，而每篇文档长度不同，所以每篇文档对应的向量元素个数不同，所以这里要将他们格式化为同一长度，策略就是高位补0</span><br><span class="line">    x_pad = kr.preprocessing.sequence.pad_sequences(data_id, max_length) </span><br><span class="line">    y_pad = kr.utils.to_categorical(label_id, num_classes=len(cat_to_id))  # 将标签转换为one-hot表示</span><br><span class="line">#    y_pad = parse_vector(label_id, len(cat_to_id))</span><br><span class="line"> </span><br><span class="line">    return x_pad, y_pad</span><br><span class="line"> </span><br><span class="line">def parse_vector(label_id, size):</span><br><span class="line">    des = []</span><br><span class="line">    for label in label_id:</span><br><span class="line">        c = np.full(size, 1e-8)</span><br><span class="line">        c[label] = 1</span><br><span class="line">        des.append(c)</span><br><span class="line"> </span><br><span class="line">    return np.array(des)</span><br><span class="line"> </span><br><span class="line">#为神经网络的训练准备经过shuffle的批次的数据。</span><br><span class="line">#x为所有文档的词id向量构成的集合，是np.array类型</span><br><span class="line">#y为所有文档对应的标签的one-hot向量集合</span><br><span class="line">#注意：batch_iter这个函数返回的是一个迭代器</span><br><span class="line">def batch_iter(x, y, batch_size=64):</span><br><span class="line">    &quot;&quot;&quot;生成批次数据&quot;&quot;&quot;</span><br><span class="line">    data_len = len(x)</span><br><span class="line">    num_batch = int((data_len - 1) / batch_size) + 1  #计算每个批次取的数据量</span><br><span class="line"> </span><br><span class="line">    #np.random.permutation是随机打乱一个数组, 比如将[0,1,2,3] 打乱成[3,1,0,2]</span><br><span class="line">    #np.arange是构造一个[0, data_len]的列表</span><br><span class="line">    indices = np.random.permutation(np.arange(data_len))</span><br><span class="line">    x_shuffle = x[indices]  #基于一个打乱的索引顺序indics，分别从x中取出对应位置的向量，并按照这个顺序组成新的x，实际就是打乱x的向量顺序</span><br><span class="line">    y_shuffle = y[indices]</span><br><span class="line"> </span><br><span class="line">    for i in range(num_batch):</span><br><span class="line">        start_id = i * batch_size</span><br><span class="line">        end_id = min((i + 1) * batch_size, data_len)</span><br><span class="line">        yield x_shuffle[start_id:end_id], y_shuffle[start_id:end_id]  #每次从打乱顺序后的x和y中依次取一个批次的数据</span><br></pre></td></tr></table></figure></p>
+<p>文件名：run_softmax.py<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line">#-*- coding:utf8 -*-</span><br><span class="line"> </span><br><span class="line">import pdb</span><br><span class="line">import os</span><br><span class="line">import tensorflow as tf</span><br><span class="line">import numpy as np</span><br><span class="line">from data_loader import read_vocab, read_category, batch_iter, process_file, build_vocab</span><br><span class="line"> </span><br><span class="line">train_file = &apos;data/baike_levelone_category_train.lst&apos;</span><br><span class="line">test_file = &apos;data/baike_levelone_category_test.lst&apos;</span><br><span class="line">vocab_file = &apos;data/baike_category_vocab.lst&apos;</span><br><span class="line">all_file = &apos;data/baike_levelone_category_all.lst&apos;</span><br><span class="line"> </span><br><span class="line">max_vocab_size = 5000</span><br><span class="line">seq_length = 600 #输入x的维度</span><br><span class="line">num_epochs = 10</span><br><span class="line">batch_size = 64</span><br><span class="line"> </span><br><span class="line">def feed_data(x_batch, y_batch):</span><br><span class="line">    feed_dict = &#123;</span><br><span class="line">        x: x_batch,</span><br><span class="line">        y_: y_batch</span><br><span class="line">    &#125;</span><br><span class="line">    return feed_dict</span><br><span class="line"> </span><br><span class="line">if not os.path.exists(vocab_file):</span><br><span class="line">    build_vocab(all_file, vocab_file, max_vocab_size)</span><br><span class="line">print &apos;build vocab over&apos;</span><br><span class="line">#全部分类，分类对应的id</span><br><span class="line">categorys, cat_to_id = read_category(all_file)</span><br><span class="line">print &apos;read category over&apos;</span><br><span class="line">words, word_to_id = read_vocab(vocab_file)</span><br><span class="line">print &apos;read vocab over&apos;</span><br><span class="line">x_train, y_train = process_file(train_file, word_to_id, cat_to_id, seq_length)</span><br><span class="line"> </span><br><span class="line">print &apos;process file over&apos;</span><br><span class="line">num_classes = len(cat_to_id)</span><br><span class="line">#定义模型</span><br><span class="line"> </span><br><span class="line">with tf.device(&apos;/cpu:0&apos;):</span><br><span class="line">    x = tf.placeholder(tf.float32, [None, seq_length], name=&apos;input_x&apos;)</span><br><span class="line">    y_ = tf.placeholder(tf.float32, [None, num_classes], name=&apos;input_y&apos;)</span><br><span class="line">    </span><br><span class="line">#    w = tf.Variable(tf.zeros([seq_length, num_classes]))</span><br><span class="line">#    b = tf.Variable(tf.zeros([num_classes]))</span><br><span class="line">    w = tf.Variable(tf.truncated_normal(shape=[seq_length, num_classes], mean=0, stddev=1))</span><br><span class="line">    b = tf.Variable(tf.truncated_normal(shape=[num_classes], mean=0, stddev=1)) </span><br><span class="line"> </span><br><span class="line">    y_mat = tf.matmul(x,w) + b    </span><br><span class="line">    y = tf.nn.softmax(y_mat)</span><br><span class="line">#    cost = -tf.reduce_sum(y_*tf.log(y))  #交叉熵的计算方式</span><br><span class="line">#    cost = tf.reduce_sum(tf.square(y_-y))</span><br><span class="line">    cost = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_, logits=y)</span><br><span class="line">    train_step = tf.train.GradientDescentOptimizer(0.005).minimize(cost)</span><br><span class="line">    print &apos;initial&apos;</span><br><span class="line">    init = tf.initialize_all_variables()</span><br><span class="line">    print &apos;session&apos;</span><br><span class="line">    sess = tf.Session()</span><br><span class="line">    sess.run(init)</span><br><span class="line">    </span><br><span class="line">    correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1)) #argmax是指取数组中最大的值所在的索引</span><br><span class="line">    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))</span><br><span class="line">    print &apos;accuracy&apos;</span><br><span class="line">    </span><br><span class="line">    for epoch in range(num_epochs):</span><br><span class="line">        print(&apos;epoch:&apos;, epoch+1)</span><br><span class="line">        batch_train = batch_iter(x_train, y_train, batch_size)</span><br><span class="line">             </span><br><span class="line">        #这里x_batch的维度是(batch_size, seq_length), batch_size其实就是每次取的文档的个数</span><br><span class="line">        for x_batch, y_batch in batch_train:</span><br><span class="line">#            pdb.set_trace() </span><br><span class="line">            feed_dict = feed_data(x_batch, y_batch)</span><br><span class="line">            sess.run(train_step, feed_dict=feed_dict)</span><br><span class="line">    </span><br><span class="line">            print &apos;accuracy&apos;,sess.run(accuracy, feed_dict=feed_dict)</span><br><span class="line">            print &apos;y&apos;,sess.run(tf.argmax(y,1), feed_dict=feed_dict)</span><br><span class="line">            print &apos;y_&apos;,sess.run(tf.argmax(y_,1), feed_dict=feed_dict)   </span><br><span class="line"> </span><br><span class="line">feed_dict = feed_data(x_train, y_train)</span><br><span class="line">print &apos;accuracy&apos;,sess.run(accuracy, feed_dict=feed_dict)</span><br></pre></td></tr></table></figure></p>
+<p>说明：数据集文件的格式为每行一个样本，以制表符分割，第一列为分本的分类，第二列为文本的内容</p>
+<p>训练打印日志如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">accuracy 0.578125</span><br><span class="line">y [5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5</span><br><span class="line"> 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5]</span><br><span class="line">y_ [ 5  5  6  1  5  2  5  9  5  5  1  5  7  5  9  1  1  5  1  5  1  1 12  5</span><br><span class="line">  5  5  5  4  5  5  7  5  5  7  5 11  5  4  5  5  5  5  5  5  1  5  6  5</span><br><span class="line"> 12  5 10  5  4  5  5  5  4 11  0  5  6  5  5  5]</span><br><span class="line">accuracy 0.5625</span><br><span class="line">y [5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5</span><br><span class="line"> 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5]</span><br><span class="line">y_ [ 1  5  5  5  4  4  7  8  5  5  2  5  5  5  5  4  5  1  5  1 10  4  6  1</span><br><span class="line">  5 12  1  5  7  5  5  5  5 11  5  5  5 11  5  5  7  1  5  7  5  5 10  4</span><br><span class="line">  5  5  5 12  5  5  5  4  5  5 12  5  5  5  1  1]</span><br><span class="line">accuracy 0.59375</span><br><span class="line">y [5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5</span><br><span class="line"> 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5]</span><br><span class="line">y_ [9 1 5 1 5 7 5 5 8 5 1 5 5 5 1 5 1 5 5 1 5 5 5 4 5 5 5 1 5 5 5 5 1 6 5 5 5</span><br><span class="line"> 5 7 5 1 7 5 5 5 5 1 6 5 1 5 1 5 5 0 7 5 5 4 7 5 5 1 7]</span><br><span class="line">accuracy 0.625</span><br><span class="line">y [5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5</span><br><span class="line"> 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5]</span><br><span class="line">y_ [11  4  5  5  5  5  5  5  5  5 11  5  5  1  5  5 11  5  5  8  5  5 11  1</span><br><span class="line">  5  2  9  5  5  1  7  5  5  5  1  1  1  1  5  5  5  5  5  5  5  5  5  5</span><br><span class="line">  5  5 12  1  1  1  5  8  5  5  5  5  1  1  1  5]</span><br><span class="line">accuracy 0.71875</span><br><span class="line">y [5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5</span><br><span class="line"> 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5]</span><br><span class="line">y_ [ 5  6  5  5  1  5  5  8  5  5  5  5  5  5  5  5  5  5  5  1  7 12  5  5</span><br><span class="line">  5  5  5  1  5  5  5  7  5  5  4  6  4  5  5  5  5  5  5  5  5  4  5  6</span><br><span class="line">  5  1  5  9  5  1 11  5  5  1  5  5  5  5  5  5]</span><br><span class="line">accuracy 0.59375</span><br><span class="line">y [5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5</span><br><span class="line"> 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5]</span><br><span class="line">y_ [ 5  0  5  5  5  1  0  1  5 11  5  5  5 11  5  5  5  5  5  5  9 11  1  5</span><br><span class="line">  6  1  4  5  5  5  5  5  7  5  6  5  5  5 11 11  5  1  5 10  5  1  1  5</span><br><span class="line">  5  5  0  1  1  5  5  5  5  9  1  5  5 11  5  5]</span><br><span class="line">accuracy 1.0</span><br><span class="line">y [5]</span><br><span class="line">y_ [5]</span><br><span class="line">accuracy 0.62927836</span><br></pre></td></tr></table></figure></p>
+<p>可以看到在训练集上的准确率只有62%，这个效果很差，当然效果差的原因可能是其他方面我没有做好。</p>
+<p>这个项目实战的学习心得：</p>
+<p>1、我们的机器上当别人在使用GPU的时候，我如果要执行我的训练，会抛出Out_OF_MEMORY内存不够的异常，本想通过with tf.device(‘/cpu:0’) 来指定让代码不使用GPU，但是这种方式不行，应该还需要其他的方式执行，我最终将代码移到另外一台机器上执行的</p>
+<p>2、梯度下降算法中学习率的选择问题</p>
+<p>学习率不要选择太大，否则很难收敛，在学习的过程中可能总是跳过最佳点位</p>
+<p>学习率也不要选择太小，否则，学习消耗的时间太长</p>
+<p>3、损失函数的选择</p>
+<p>我选择的损失函数是交叉熵，我一开始是自己写的交叉熵算法，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cost = -tf.reduce_sum(y_*tf.log(y))</span><br></pre></td></tr></table></figure></p>
+<p>这导致的一个问题是，在优化的过程中，w和b的值出现[nan, nan, nan, nan]的问题。</p>
+<p>原因应该是公式中用到了log函数，因为它的参数的范围是大于0， 如果给它的参数为0，就会抛异常，这应该是引起nan的原因</p>
+<p>解决办法是，用tensorflow自带的计算交叉熵的函数，tensorflow提供了四种计算交叉熵的函数，可以选择其中一种</p>
 
           
         
@@ -1181,7 +1023,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2017/06/13/压测中提高并发数后服务端处理时间增长的原因分析/">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2018/06/30/如何用softmax和sigmoid来做多类分类和多标签分类/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="jasonjie">
@@ -1200,7 +1042,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/06/13/压测中提高并发数后服务端处理时间增长的原因分析/" itemprop="url">压测中提高并发数后服务端处理时间增长的原因分析</a></h1>
+                <a class="post-title-link" href="/2018/06/30/如何用softmax和sigmoid来做多类分类和多标签分类/" itemprop="url">如何用softmax和sigmoid来做多类分类和多标签分类</a></h1>
         
 
         <div class="post-meta">
@@ -1212,8 +1054,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-13T19:08:13+08:00">
-                2017-06-13
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-30T20:00:55+08:00">
+                2018-06-30
               </time>
             
 
@@ -1235,8 +1077,8 @@
               
               
                 <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                  <a href="/categories/Python/" itemprop="url" rel="index">
-                    <span itemprop="name">Python</span>
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
                   </a>
                 </span>
 
@@ -1273,13 +1115,12 @@
 
       
         
-          <p>后端逻辑：  接收请求、分词匹配、读redis做一些过滤策略</p>
-<p>在不断提高并发数的压测过程中，发现一个问题，后台服务对一个请求的处理时间也在增高， 而且增高的主要时间是消耗在读redis过滤那块</p>
-<p>过滤那块的主要逻辑是：从redis中读数据，并基于这些数据做一些过滤的策略</p>
-<p>为什么这块的耗时会增长呢？难道是redis的线程池不够用？导致有些redis的io请求要等待一会？<br>
+          <p>首先，说下多类分类和多标签分类的区别</p>
+<p>多标签分类： 一个样本可以属于多个类别（或标签），不同类之间是有关联的，比如一个文本被被划分成“人物”和“体育人物”两个标签。很显然这两个标签不是互斥的，而是有关联的<br>多类分类：  一个样本属于且只属于多个分类中的一个，一个样本只能属于一个类，不同类之间是互斥的，比如一个文本只能被划分成“人物”，或者被划分成“文化”，而不能同时被划分成“人物”和“文化”，“文化”和“人物”这两个分类就是互斥的</p>
+<p>那么，如何用softmax和sigmoid来做多类分类和多标签分类呢？<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/06/13/压测中提高并发数后服务端处理时间增长的原因分析/#more" rel="contents">
+            <a class="btn" href="/2018/06/30/如何用softmax和sigmoid来做多类分类和多标签分类/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1330,7 +1171,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2017/06/09/日志中每段代码执行时间的和不等于整段代码执行的总时间/">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2018/06/06/基于sigmoid的文本多标签分类模型代码实现/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="jasonjie">
@@ -1349,7 +1190,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/06/09/日志中每段代码执行时间的和不等于整段代码执行的总时间/" itemprop="url">日志中每段代码执行时间的和不等于整段代码执行的总时间</a></h1>
+                <a class="post-title-link" href="/2018/06/06/基于sigmoid的文本多标签分类模型代码实现/" itemprop="url">基于sigmoid的文本多标签分类模型代码实现</a></h1>
         
 
         <div class="post-meta">
@@ -1361,8 +1202,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-09T19:06:41+08:00">
-                2017-06-09
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-06T19:58:31+08:00">
+                2018-06-06
               </time>
             
 
@@ -1384,8 +1225,8 @@
               
               
                 <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                  <a href="/categories/Python/" itemprop="url" rel="index">
-                    <span itemprop="name">Python</span>
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
                   </a>
                 </span>
 
@@ -1422,14 +1263,14 @@
 
       
         
-          <p>代码逻辑：</p>
-<p>def  getInlink()</p>
-<pre><code>A  -&gt; B  -&gt; C -&gt;  D
-</code></pre><p>在tornado中调用getInlink<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">@tornado.gen.coroutine</span><br><span class="line"> </span><br><span class="line">    def get(self):</span><br><span class="line"> </span><br><span class="line">        start2 = int(time.time()*1000)</span><br><span class="line"> </span><br><span class="line">        error, errReason, lstSummary = yield self.getInlink(utfQuery)</span><br><span class="line"> </span><br><span class="line">        print &apos;total use %d&apos; % (int(time.time()*1000)-start2)</span><br></pre></td></tr></table></figure></p>
-<p>实践中，分别记录了上面四个步骤执行的时间， 假设为At, Bt, Ct, Dt，并且记录了getInlink总的时间，假设为ADt（调用getInlink方法到返回的时间）<br>
+          <p>sigmoid一般是用来做二分类的，它是将一个标量的数字转换成[0,1]之间的一个概率值，如果概率值大于0.5， 则判定为是某个分类，否则则不是某个分类，公式如下：<br><img src="/upload_image/6.png" alt=""><br>本文基于sigmoid做了一个将一段长文本打上多个标签的算法模型，首先声明，我的模型最终的效果不好，因为我的文本很长，而且采用的模型很简单，就一层神经网络，权当练手。</p>
+<p>数据集文件的格式为每行一个样本，以制表符分隔。第一列为文本的多个标签，以逗号分隔，第二列为文本内容</p>
+<p>和我之前写的一篇基于softmax多文本多分类模型的结构差不多，代码分成两个文件</p>
+<p>第一个文件: data_loader.py</p>
+<p>主要用来读取训练数据，并预处理，代码如下：<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/06/09/日志中每段代码执行时间的和不等于整段代码执行的总时间/#more" rel="contents">
+            <a class="btn" href="/2018/06/06/基于sigmoid的文本多标签分类模型代码实现/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1480,7 +1321,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2017/06/03/请求方报超时，服务日志中记录的时间却少有超时/">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2018/06/03/用Docker容器自带的tensorflow-serving部署模型对外服务（成功率100-）/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="jasonjie">
@@ -1499,7 +1340,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/06/03/请求方报超时，服务日志中记录的时间却少有超时/" itemprop="url">请求方报超时，服务日志中记录的时间却少有超时</a></h1>
+                <a class="post-title-link" href="/2018/06/03/用Docker容器自带的tensorflow-serving部署模型对外服务（成功率100-）/" itemprop="url">用Docker容器自带的tensorflow serving部署模型对外服务（成功率100%）</a></h1>
         
 
         <div class="post-meta">
@@ -1511,8 +1352,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-03T19:02:56+08:00">
-                2017-06-03
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-03T19:51:26+08:00">
+                2018-06-03
               </time>
             
 
@@ -1534,8 +1375,8 @@
               
               
                 <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                  <a href="/categories/Python/" itemprop="url" rel="index">
-                    <span itemprop="name">Python</span>
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
                   </a>
                 </span>
 
@@ -1572,16 +1413,15 @@
 
       
         
-          <p>请求方报超时的比例大概有4%</p>
-<p>他们设置的超时时间是500ms</p>
-<p>但是我们统计日志，服务时间超过500ms的日志很少</p>
-<p>原因是什么呢？</p>
-<p>超时原因分析：</p>
-<p>1、请求内容太长</p>
-<p>根据请求方超时日志， 大多数query的长度都是1w以上，这些query我手动请求，响应时间的确大于500ms， 在服务端还没有处理完的时候，客户端已经超时断开了<br>
+          <p>前传：</p>
+<p>相信很多人和我一样，在试图安装tensorflow serving的时候，翻遍了网上的博客和官网文档，安装都是以失败而告终，我也是一样，这个问题折磨了我两个星期之久，都快放弃了。幸运的是在同事的建议下，我采用了一种迂回的策略安装成功了。</p>
+<p>我们采用的策略是：</p>
+<pre><code>pull一个已经安装好了tensorflow serving的docker镜像，替换它自带的一些模型为我们自己的模型。
+</code></pre><p>步骤：</p>
+<p>1、拉取带tensorflow serving的docker镜像，这样我们服务器上就有了一个安装了ModelServer的docker容器, 这个容器就可以看做一台虚拟机，这个虚拟机上已经安装好了tensorflow serving，环境有了，就可以用它来部署我们的模型了。注意这个拉取下来后不是直接放在当前目录的，而是docker默认存储的路径，这个是个docker容器，和第2步clone下来的不是同一个东西<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/06/03/请求方报超时，服务日志中记录的时间却少有超时/#more" rel="contents">
+            <a class="btn" href="/2018/06/03/用Docker容器自带的tensorflow-serving部署模型对外服务（成功率100-）/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1632,7 +1472,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2017/05/24/scrapy中自定义过滤规则以及start-urls不进过滤器的问题/">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2018/05/05/ab测试post如何用文件提交json格式的参数/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="jasonjie">
@@ -1651,7 +1491,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/05/24/scrapy中自定义过滤规则以及start-urls不进过滤器的问题/" itemprop="url">scrapy中自定义过滤规则以及start_urls不进过滤器的问题</a></h1>
+                <a class="post-title-link" href="/2018/05/05/ab测试post如何用文件提交json格式的参数/" itemprop="url">ab测试post如何用文件提交json格式的参数</a></h1>
         
 
         <div class="post-meta">
@@ -1663,8 +1503,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-24T18:57:22+08:00">
-                2017-05-24
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-05T19:47:52+08:00">
+                2018-05-05
               </time>
             
 
@@ -1724,20 +1564,174 @@
 
       
         
-          <p>为什么要自定义过滤规则呢？ 首先，我们需要过滤，但是不是说抓一次就不抓了，因为我们的抓取是一段时间抓取一次</p>
-<p>自定义策略如下：</p>
-<p>首先我试图直接继承RFPDupeFilter</p>
-<p>在settings.py同级的目录下新建dupefilter.py文件，按照网上说的方法，写了内容如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">from scrapy.dupefilter import RFPDupeFilter</span><br><span class="line">import hashlib</span><br><span class="line">from scrapy.utils.request import request_fingerprint</span><br><span class="line">from scrapy.dupefilter import BaseDupeFilter</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">class URLFilter(RFPDupeFilter):</span><br><span class="line"> </span><br><span class="line">    def __init(self):</span><br><span class="line">        RFPDupeFilter.__init__(self)</span><br><span class="line"> </span><br><span class="line">    def request_seen(self, request):</span><br><span class="line"> </span><br><span class="line">        fp = self.request_fingerprint(request)</span><br><span class="line">        added = self.server.sadd(self.key, fp)</span><br><span class="line"> </span><br><span class="line">        return added == 0</span><br></pre></td></tr></table></figure></p>
+          <p>在网上找了很多方法都失败</p>
+<p>首先我的参数是这样的:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">服务端需要一个名称为data的参数</span><br><span class="line">值为：&quot;&#123;&apos;title&apos;: &quot;刘德华&quot;&#125;&quot;， 即值是一个json格式的字符串</span><br></pre></td></tr></table></figure></p>
+<p>错误方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ab -n10000 -c10 -T application/json -p post.json  http://10.134.75.38:1234/find/lemma/category</span><br></pre></td></tr></table></figure></p>
+<p>post.json的格式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;data&quot;: &#123;&apos;title&apos;: &quot;刘德华&quot;&#125;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其实我们都想当然了，以为传入的参数是json的，则-T的类型必须是 application/json</p>
+<p>这两篇文档给了我灵感：<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/05/24/scrapy中自定义过滤规则以及start-urls不进过滤器的问题/#more" rel="contents">
+            <a class="btn" href="/2018/05/05/ab测试post如何用文件提交json格式的参数/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
           <!--/noindex-->
         
       
-    </div>
+    </p></div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2018/04/19/机器学习中遇到的问题/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="jasonjie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jasonjie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/19/机器学习中遇到的问题/" itemprop="url">机器学习中遇到的问题</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-19T19:42:29+08:00">
+                2018-04-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>1、ImportError: libcublas.so.9.0: cannot open shared object file: No such file or directory</p>
+<p>找不到so库文件</p>
+<p>用自己的账户运行包会报上面的错误，但是用root账户运行却没有问题</p>
+<p>原因：root账户里面的LD_LIBRARY_PATH路径能找到这个so文件，但是自己的账户的LD_LIBRARY_PATH路径下找不到</p>
+<p>解决办法：在~/.bashrc文件中添加：  export LD_LIBRARY_PATH=/usr/local/cuda-9.0/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}</p>
+<p>2、对训练好的模型部署tornado服务</p>
+<p>第一次http请求的时候正常，但是第二次请求的时候会报如下错误：<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/04/19/机器学习中遇到的问题/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </p></div>
     
     
     
@@ -1772,7 +1766,7 @@
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1818,7 +1812,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">40</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1840,7 +1834,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
