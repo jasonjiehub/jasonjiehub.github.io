@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Redis,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="现象：      无线词条页访问失败问题分析： 1、首先，查看日志 日志中非常显眼的是，从Redis读取词条的pv耗时很长，高达20多秒， 看样子是访问Redis速度很慢导致 2、查看Redis的慢日志1&amp;gt; SLOWLOG GET 可以得到如下结果：1234567891011121314151617181920212223242525) 1) (integer) 160">
+<meta name="keywords" content="Redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis慢日志问题解决">
+<meta property="og:url" content="http://www.denglinjie.com/2018/12/18/Redis慢日志问题解决/index.html">
+<meta property="og:site_name" content="jasonjie">
+<meta property="og:description" content="现象：      无线词条页访问失败问题分析： 1、首先，查看日志 日志中非常显眼的是，从Redis读取词条的pv耗时很长，高达20多秒， 看样子是访问Redis速度很慢导致 2、查看Redis的慢日志1&amp;gt; SLOWLOG GET 可以得到如下结果：1234567891011121314151617181920212223242525) 1) (integer) 160">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-12-18T09:21:42.160Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis慢日志问题解决">
+<meta name="twitter:description" content="现象：      无线词条页访问失败问题分析： 1、首先，查看日志 日志中非常显眼的是，从Redis读取词条的pv耗时很长，高达20多秒， 看样子是访问Redis速度很慢导致 2、查看Redis的慢日志1&amp;gt; SLOWLOG GET 可以得到如下结果：1234567891011121314151617181920212223242525) 1) (integer) 160">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.denglinjie.com/2018/12/18/Redis慢日志问题解决/">
+
+
+
+
+
+  <title>Redis慢日志问题解决 | jasonjie</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">jasonjie</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.denglinjie.com/2018/12/18/Redis慢日志问题解决/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="jasonjie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jasonjie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Redis慢日志问题解决</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-18T17:17:42+08:00">
+                2018-12-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>现象：<br>      无线词条页访问失败<br>问题分析：</p>
+<p>1、首先，查看日志</p>
+<p>日志中非常显眼的是，从Redis读取词条的pv耗时很长，高达20多秒， 看样子是访问Redis速度很慢导致</p>
+<p>2、查看Redis的慢日志<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; SLOWLOG GET</span><br></pre></td></tr></table></figure></p>
+<p>可以得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">25) 1) (integer) 160            #日志的唯一标识符（uid）</span><br><span class="line">     2) (integer) 1543060013    #命令执行的时间点，UNIX时间戳</span><br><span class="line">     3) (integer) 22679074      #命令执行的时长，单位是微妙</span><br><span class="line">     4) 1) &quot;ZREVRANGE&quot;          #命令及其参数信息</span><br><span class="line">        2) &quot;baike_lemma_pv&quot;</span><br><span class="line">        3) &quot;0&quot;</span><br><span class="line">        4) &quot;20000000&quot;</span><br><span class="line">        5) &quot;withscores&quot;</span><br><span class="line">26) 1) (integer) 159</span><br><span class="line">     2) (integer) 1542973618</span><br><span class="line">     3) (integer) 22829521</span><br><span class="line">     4) 1) &quot;ZREVRANGE&quot;</span><br><span class="line">        2) &quot;baike_lemma_pv&quot;</span><br><span class="line">        3) &quot;0&quot;</span><br><span class="line">        4) &quot;20000000&quot;</span><br><span class="line">        5) &quot;withscores&quot;</span><br><span class="line">27) 1) (integer) 158</span><br><span class="line">     2) (integer) 1542888649</span><br><span class="line">     3) (integer) 22396426</span><br><span class="line">     4) 1) &quot;ZREVRANGE&quot;</span><br><span class="line">        2) &quot;baike_lemma_pv&quot;</span><br><span class="line">        3) &quot;0&quot;</span><br><span class="line">        4) &quot;20000000&quot;</span><br><span class="line">        5) &quot;withscores&quot;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到有些请求耗时特别长，高达20s，这个时间似乎和日志中的时间比较吻合</p>
+<p>3、再看下当前连接上Redis的连接数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; info</span><br></pre></td></tr></table></figure></p>
+<p>得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># Clients</span><br><span class="line">connected_clients:626</span><br></pre></td></tr></table></figure></p>
+<p>目前有626个客户端和Redis服务端建立了连接，并排队等待被Redis的单线程处理， 这个数量说多也不多，说少也不少</p>
+<p>4、解决问题</p>
+<p>根据第二步中的慢日志， 可以定位到相关的命令详情如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./redis-cli -h 10.134.30.00 -p 12002 -a wen@sog.com ZREVRANGE baike_lemma_pv 0 20000000 withscores | awk &apos;&#123;if(NR % 2 == 1) a=$0; else &#123;a=a&quot;\t&quot;$0; print a; a=&quot;&quot;&#125;&#125;&apos; &gt;&gt; ./topPvLemmaId.lst</span><br></pre></td></tr></table></figure></p>
+<p>这个命令是要一次性从ZSET结构中读取2000w的数据，这不耗时才怪呢？这一个命令耗时20s，我们知道Redis是单线程对外服务的，那么服务线程处理这个命令的时候，其他的命令都需要等待</p>
+<p>对这个命令做了些改造，其实相关业务只需要score排序头部的十几万数据， 所以改造如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">save_file=$1</span><br><span class="line">for (( start=1; start&lt;=200000; start+=10000 ))</span><br><span class="line">do</span><br><span class="line">    end=$[$start+10000-1]</span><br><span class="line">    ./redis-cli -h 10.134.30.00 -p 12002 -a wen@sog.com ZREVRANGE baike_lemma_pv $start $end withscores | awk  &apos;&#123;if(NR % 2 == 1) a=$0; else &#123;a=a&quot;\t&quot;$0; if($0 &gt; 70000) print a; a=&quot;&quot;&#125;&#125;&apos; &gt;&gt; $save_file</span><br><span class="line">done</span><br></pre></td></tr></table></figure></p>
+<p>当然如果仍然要读取全部的ZSET中的数据， 可以用ZSCAN命令来不停的扫描， 每次扫描读取一部分</p>
+<p>其实redis的info信息是非常详细的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><span class="line"># Server</span><br><span class="line">redis_version:2.8.19</span><br><span class="line">redis_git_sha1:00000000</span><br><span class="line">redis_git_dirty:0</span><br><span class="line">redis_build_id:bcc7511e1a094fe9</span><br><span class="line">redis_mode:standalone</span><br><span class="line">os:Linux 2.6.32.43-tlinux-1.0.22-default x86_64</span><br><span class="line">arch_bits:64</span><br><span class="line">multiplexing_api:epoll</span><br><span class="line">gcc_version:4.4.6</span><br><span class="line">process_id:17351</span><br><span class="line">run_id:61f2d7ca5a7507914252a0cc53ef7cb96c1f98fb</span><br><span class="line">tcp_port:10002</span><br><span class="line">uptime_in_seconds:66262857</span><br><span class="line">uptime_in_days:766</span><br><span class="line">hz:10</span><br><span class="line">lru_clock:926904</span><br><span class="line">config_file:/data/redis-server/baike_database_master_10002/redis_10002.conf</span><br><span class="line"> </span><br><span class="line"># Clients</span><br><span class="line">connected_clients:177</span><br><span class="line">client_longest_output_list:0</span><br><span class="line">client_biggest_input_buf:0</span><br><span class="line">blocked_clients:0</span><br><span class="line"> </span><br><span class="line"># Memory</span><br><span class="line">used_memory:3870592296</span><br><span class="line">used_memory_human:3.60G</span><br><span class="line">used_memory_rss:4278693888</span><br><span class="line">used_memory_peak:4569335968</span><br><span class="line">used_memory_peak_human:4.26G</span><br><span class="line">used_memory_lua:35840</span><br><span class="line">mem_fragmentation_ratio:1.11</span><br><span class="line">mem_allocator:jemalloc-3.6.0</span><br><span class="line"> </span><br><span class="line"># Persistence</span><br><span class="line">loading:0</span><br><span class="line">rdb_changes_since_last_save:20833780660</span><br><span class="line">rdb_bgsave_in_progress:0</span><br><span class="line">rdb_last_save_time:1495853683</span><br><span class="line">rdb_last_bgsave_status:ok</span><br><span class="line">rdb_last_bgsave_time_sec:17</span><br><span class="line">rdb_current_bgsave_time_sec:-1</span><br><span class="line">aof_enabled:1</span><br><span class="line">aof_rewrite_in_progress:0</span><br><span class="line">aof_rewrite_scheduled:0</span><br><span class="line">aof_last_rewrite_time_sec:35</span><br><span class="line">aof_current_rewrite_time_sec:-1</span><br><span class="line">aof_last_bgrewrite_status:ok</span><br><span class="line">aof_last_write_status:ok</span><br><span class="line">aof_current_size:1445634916</span><br><span class="line">aof_base_size:1165444727</span><br><span class="line">aof_pending_rewrite:0</span><br><span class="line">aof_buffer_length:0</span><br><span class="line">aof_rewrite_buffer_length:0</span><br><span class="line">aof_pending_bio_fsync:0</span><br><span class="line">aof_delayed_fsync:0</span><br><span class="line"> </span><br><span class="line"># Stats</span><br><span class="line">total_connections_received:90906524</span><br><span class="line">total_commands_processed:83533940789</span><br><span class="line">instantaneous_ops_per_sec:1601</span><br><span class="line">total_net_input_bytes:3031104314026</span><br><span class="line">total_net_output_bytes:1957795787473</span><br><span class="line">instantaneous_input_kbps:60.44</span><br><span class="line">instantaneous_output_kbps:480.64</span><br><span class="line">rejected_connections:0</span><br><span class="line">sync_full:2</span><br><span class="line">sync_partial_ok:0</span><br><span class="line">sync_partial_err:0</span><br><span class="line">expired_keys:0</span><br><span class="line">evicted_keys:0</span><br><span class="line">keyspace_hits:16227030786</span><br><span class="line">keyspace_misses:995680173</span><br><span class="line">pubsub_channels:0</span><br><span class="line">pubsub_patterns:0</span><br><span class="line">latest_fork_usec:79994</span><br><span class="line"> </span><br><span class="line"># Replication</span><br><span class="line">role:master</span><br><span class="line">connected_slaves:1</span><br><span class="line">slave0:ip=10.241.00.00,port=1022,state=online,offset=1272093723257,lag=1</span><br><span class="line">master_repl_offset:1272093741351</span><br><span class="line">repl_backlog_active:1</span><br><span class="line">repl_backlog_size:1048576</span><br><span class="line">repl_backlog_first_byte_offset:1272092692776</span><br><span class="line">repl_backlog_histlen:1048576</span><br><span class="line"> </span><br><span class="line"># CPU</span><br><span class="line">used_cpu_sys:525197.25</span><br><span class="line">used_cpu_user:548578.62</span><br><span class="line">used_cpu_sys_children:2437.03</span><br><span class="line">used_cpu_user_children:33747.64</span><br><span class="line"> </span><br><span class="line"># Keyspace</span><br><span class="line">db0:keys=19935578,expires=0,avg_ttl=0</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Redis/" rel="tag"># Redis</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/18/一篇测试/" rel="next" title="一篇测试">
+                <i class="fa fa-chevron-left"></i> 一篇测试
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">jasonjie</p>
+              <p class="site-description motion-element" itemprop="description">生活不只眼前的苟且，还有诗和远方的田野</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jasonjie</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
