@@ -32,8 +32,8 @@ http://www.denglinjie.com/2016/09/20/2016-09-20-Spring源码分析之ProxyFactor
 http://www.denglinjie.com/2016/09/20/2016-09-20-Spring源码分析之SpringMVC的DispatcherServlet是如何处理Http请求的/
 http://www.denglinjie.com/2016/09/18/Java开发Maven插件/
 http://www.denglinjie.com/2016/09/18/2016-09-18-Spring源码分析之lazy-init属性的配置/
-http://www.denglinjie.com/2016/09/17/2016-09-17-Spring源码分析之doDispatch分发请求逻辑/
 http://www.denglinjie.com/2016/09/17/2016-09-17-Spring源码分析之BeanPostProcessor接口和BeanFactoryPostProcessor接口方法不执行原因分析/
+http://www.denglinjie.com/2016/09/17/2016-09-17-Spring源码分析之doDispatch分发请求逻辑/
 http://www.denglinjie.com/2016/09/14/2016-09-14-Spring源码分析之Aop中拦截器,适配器,通知之间的关系/
 http://www.denglinjie.com/2016/09/12/2016-09-12-Spring IOC学习心得之源码级分析ContextLoaderListener的作用(IOC容器初始化入口)/
 http://www.denglinjie.com/2016/09/12/2016-09-12-Spring IOC学习心得之注册bean的依赖关系/
